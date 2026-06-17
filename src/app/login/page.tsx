@@ -53,7 +53,7 @@ export default function AuthPage() {
       }
 
       toast.success("Welcome back!");
-      router.push("/dashboard");
+      router.push("/app");
       router.refresh();
     } catch (err: any) {
       toast.error(err.message);
@@ -70,7 +70,7 @@ export default function AuthPage() {
 
         <div className="relative z-10 flex-1 flex flex-col">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center text-xl shadow-lg">🌿</div>
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center text-xl shadow-md">🌿</div>
             <div className="font-serif text-2xl font-bold text-white">MindBridge<span className="text-teal-400">.</span></div>
           </div>
 
@@ -82,7 +82,7 @@ export default function AuthPage() {
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white rounded-3xl p-10 shadow-xl border border-slate-100">
+        <div className="w-full max-w-[460px] bg-white rounded-3xl p-10 shadow-sm border-1 border-slate-100">
           <h1 className="font-serif text-3xl font-bold text-slate-900 mb-2 tracking-tight">
             {mode === "login" ? "Welcome back" : "Create account"}
           </h1>
@@ -116,7 +116,7 @@ export default function AuthPage() {
               <input required type="password" name="password" value={form.password} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="••••••••" />
             </div>
 
-            <button disabled={loading} type="submit" className="font-sans w-full p-4 mt-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-white font-bold transition-all shadow-md disabled:opacity-70">
+            <button disabled={loading} type="submit" className="font-sans w-full p-4 mt-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-white font-bold transition-all shadow-sm disabled:opacity-70">
               {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
             </button>
           </form>

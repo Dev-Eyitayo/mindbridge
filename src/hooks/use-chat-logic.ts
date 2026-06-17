@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 export function useChatLogic(sessionId?: string) {
@@ -6,9 +6,9 @@ export function useChatLogic(sessionId?: string) {
   const [messages, setMessages] = useState<{ id: string, role: 'user' | 'assistant', content: string }[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isHistoryLoading, setIsHistoryLoading] = useState(false); // New state for loading history
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  // Load history when sessionId changes
   useEffect(() => {
     if (!sessionId || sessionId === "new") {
       setMessages([]);
@@ -17,11 +17,9 @@ export function useChatLogic(sessionId?: string) {
     }
 
     const fetchHistory = async () => {
-      setIsHistoryLoading(true); // Start spinner
+      setIsHistoryLoading(true);
       try {
-        const res = await fetch(`/api/chat/history?sessionId=${sessionId}`, {
-          credentials: 'include',
-        });
+        const res = await fetch(`/api/chat/history?sessionId=${sessionId}`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setMessages(data);
@@ -29,7 +27,7 @@ export function useChatLogic(sessionId?: string) {
       } catch (err) {
         console.error("Failed to load history:", err);
       } finally {
-        setIsHistoryLoading(false); // Stop spinner
+        setIsHistoryLoading(false);
       }
     };
     fetchHistory();
@@ -42,23 +40,18 @@ export function useChatLogic(sessionId?: string) {
     const currentInput = input.trim();
     if (!currentInput) return;
 
+    const activeSessionId = sessionId || 'new';
     const userMessage = { id: Date.now().toString(), role: 'user' as const, content: currentInput };
-    const newMessages = [...messages, userMessage];
     
-    setMessages(newMessages);
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const payload = {
-        messages: newMessages.map(({ role, content }) => ({ role, content })),
-        sessionId,
-      };
-
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ messages: [...messages, userMessage], sessionId: activeSessionId }),
         credentials: 'include', 
       });
 
@@ -66,14 +59,14 @@ export function useChatLogic(sessionId?: string) {
       
       const newSessionId = response.headers.get('X-Session-Id');
       
-      // If we were on "new" and got a real ID, navigate smoothly
-      if (sessionId === 'new' && newSessionId) {
-        router.replace(`/dashboard/${newSessionId}`);
+      if ((!sessionId || sessionId === 'new') && newSessionId) {
+        startTransition(() => {
+          router.replace(`/app/${newSessionId}`);
+        });
         return; 
       }
 
       if (!response.body) throw new Error("No response body");
-
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       const assistantMessageId = (Date.now() + 1).toString();
@@ -84,9 +77,7 @@ export function useChatLogic(sessionId?: string) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
-        setMessages(prev => prev.map(m => 
-          m.id === assistantMessageId ? { ...m, content: m.content + chunk } : m
-        ));
+        setMessages(prev => prev.map(m => m.id === assistantMessageId ? { ...m, content: m.content + chunk } : m));
       }
     } catch (err) {
       console.error("Chat Error:", err);
@@ -95,14 +86,5 @@ export function useChatLogic(sessionId?: string) {
     }
   }, [input, messages, sessionId, router]);
 
-  // Return the new isHistoryLoading state
-  return { 
-    messages, 
-    setMessages, 
-    input, 
-    handleInputChange, 
-    handleSubmit, 
-    isLoading, 
-    isHistoryLoading 
-  };
+  return { messages, setMessages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading, isTransitioning: isPending };
 }
