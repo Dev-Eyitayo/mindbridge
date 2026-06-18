@@ -9,6 +9,11 @@ const groq = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
@@ -17,10 +22,10 @@ export async function POST(req: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  let { messages, sessionId } = await req.json();
+  let { messages, sessionId }: { messages: Message[]; sessionId?: string } = await req.json();
   let isNewSession = !sessionId || sessionId === "new";
 
-  // Create session if it's new
+  // Create new session if needed
   if (isNewSession) {
     const newSession = await prisma.chatSession.create({
       data: {
@@ -31,52 +36,75 @@ export async function POST(req: Request) {
     sessionId = newSession.id;
   }
 
+  if (!sessionId) {
+    return new NextResponse("Session ID is required", { status: 400 });
+  }
+
   const userMessage = messages[messages.length - 1];
 
   // Save user message
   await prisma.message.create({
-    data: { sessionId, role: 'user', content: userMessage.content, userId }
+    data: { 
+      sessionId, 
+      role: 'user', 
+      content: userMessage.content, 
+      userId 
+    }
   });
 
   // Get AI response
   const response = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
-    messages: messages.map(({ role, content }: any) => ({ role, content })),
+    messages: messages.map(({ role, content }) => ({ role, content })),
     stream: true,
   });
 
   const stream = new ReadableStream({
     async start(controller) {
       let fullResponse = "";
-      for await (const chunk of response) {
-        const text = chunk.choices[0]?.delta?.content || '';
-        fullResponse += text;
-        controller.enqueue(new TextEncoder().encode(text));
+
+      try {
+        for await (const chunk of response) {
+          const text = chunk.choices[0]?.delta?.content || '';
+          fullResponse += text;
+          controller.enqueue(new TextEncoder().encode(text));
+        }
+      } catch (error) {
+        console.error("Streaming error:", error);
+      } finally {
+        controller.close();
       }
-      controller.close();
 
-      // Save AI response
+      // Save assistant response
       await prisma.message.create({
-        data: { sessionId, role: 'assistant', content: fullResponse, userId }
+        data: { 
+          sessionId, 
+          role: 'assistant', 
+          content: fullResponse, 
+          userId 
+        }
       });
 
-      // State-based Title Generation: Only rename if it's still "New Chat"
-      const session = await prisma.chatSession.findUnique({
-        where: { id: sessionId },
-        select: { title: true }
-      });
-
-      if (session?.title === "New Chat") {
+      // Background Title Generation (only for new chats)
+      if (isNewSession) {
         try {
           const titleCompletion = await groq.chat.completions.create({
             model: 'llama-3.1-8b-instant',
             messages: [
-              { role: 'system', content: 'Generate a short title (max 5 words) for this chat based on the user message. Return only the title.' },
+              { 
+                role: 'system', 
+                content: 'Generate a short, natural title (3-6 words) for this conversation. Return ONLY the title, no quotes or extra text.' 
+              },
               { role: 'user', content: userMessage.content }
             ],
+            temperature: 0.7,
+            max_tokens: 30,
           });
 
-          const newTitle = titleCompletion.choices[0]?.message?.content?.replace(/['"]/g, '') || "New Chat";
+          let newTitle = titleCompletion.choices[0]?.message?.content?.trim() || "New Chat";
+          
+          // Clean title
+          newTitle = newTitle.replace(/^["']|["']$/g, '').trim();
 
           await prisma.chatSession.update({
             where: { id: sessionId },
@@ -92,6 +120,7 @@ export async function POST(req: Request) {
   return new Response(stream, {
     headers: {
       'X-Session-Id': sessionId,
+      'Content-Type': 'text/event-stream',
     },
   });
 }

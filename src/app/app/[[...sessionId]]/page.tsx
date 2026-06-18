@@ -10,12 +10,10 @@ import { useEffect, useRef, use } from "react";
 export default function DashboardPage({ params }: { params: Promise<{ sessionId?: string[] }> }) {
   const { data: session } = useSession();
   const unwrappedParams = use(params);
-  
   const sessionId = unwrappedParams?.sessionId?.[0];
-  
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading } = useChatLogic(sessionId);
-  
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const firstName = session?.user?.name?.split(" ")[0] || "there";
@@ -41,10 +39,12 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
     }, 0);
   };
 
+  // Auto-scroll to bottom smoothly
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
   }, [messages]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -64,15 +64,34 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
     }
   };
 
+  // ---- Render decision, in priority order ----
+  //
+  // 1. We have messages -> always render the chat thread. This is checked
+  //    FIRST and is the load-bearing fix: messages now come from the
+  //    Zustand store (see useChatLogic), which is re-keyed (not cleared)
+  //    when "new" becomes a real sessionId. So at the exact moment
+  //    router.replace fires, `messages` is already the same non-empty
+  //    array it was a millisecond earlier. There is no render frame in
+  //    which sessionId is the new uuid AND messages is empty, because
+  //    those two facts are now updated in the same synchronous store
+  //    write (promoteDraftToSession), not across a fetch boundary.
+  //
+  // 2. Only if there are truly zero messages AND we're fetching a cold
+  //    session's history do we show the skeleton. This path is only ever
+  //    hit for a direct link / refresh into an existing session, never
+  //    for the new -> uuid transition.
+  //
+  // 3. Otherwise, zero messages and not loading -> the welcome screen.
+  const showSkeleton = isHistoryLoading && messages.length === 0;
+  const showWelcome = !showSkeleton && messages.length === 0;
+
   return (
     <div className="flex-1 flex flex-col h-screen bg-slate-50">
-      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-6 md:p-8" ref={scrollRef}>
         <div className="max-w-3xl mx-auto">
-          
-          {isHistoryLoading ? (
+          {showSkeleton ? (
             <ChatSkeleton />
-          ) : messages.length === 0 ? (
+          ) : showWelcome ? (
             <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
               <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
                 <Sparkles className="text-teal-600" size={36} />
@@ -86,7 +105,7 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
                 {suggestions.map((s, i) => (
-                  <button 
+                  <button
                     key={i}
                     onClick={() => handleSuggestionClick(s.text)}
                     className="flex flex-col items-start p-5 bg-white border border-slate-200 hover:border-teal-200 rounded-xl text-left transition-colors hover:bg-slate-50"
@@ -102,13 +121,11 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
               {messages.map((m) => (
                 <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] px-6 py-4 text-[15.5px] leading-relaxed rounded-2xl ${
-                    m.role === 'user' 
-                      ? 'bg-teal-600 text-white rounded-br-md' 
+                    m.role === 'user'
+                      ? 'bg-teal-600 text-white rounded-br-md'
                       : 'bg-white border border-slate-200 text-slate-800 rounded-bl-md'
                   }`}>
-                    <ReactMarkdown>
-                      {m.content}
-                    </ReactMarkdown>
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
                   </div>
                 </div>
               ))}
@@ -123,23 +140,15 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
         <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="relative">
             <textarea
-              ref={textareaRef}
               value={input}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               rows={1}
-              className="w-full resize-none bg-white border border-slate-200 focus:border-slate-300 focus:outline-none rounded-2xl py-4 pl-6 pr-16 text-slate-900 placeholder:text-slate-400 text-[15.5px] leading-relaxed max-h-[180px] overflow-auto 
-                scrollbar-none
-                [-ms-overflow-style:none] 
-                [scrollbar-width:none]"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
+              className="w-full resize-none bg-white border border-slate-200 focus:border-slate-300 focus:outline-none rounded-2xl py-4 pl-6 pr-16 text-slate-900 placeholder:text-slate-400 text-[15.5px] leading-relaxed max-h-[180px] overflow-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             />
-            
-            <button 
+            <button
               type="submit"
               disabled={isLoading || !input.trim()}
               className="absolute right-3 bottom-3 p-3 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white rounded-xl transition-colors"
@@ -153,16 +162,12 @@ export default function DashboardPage({ params }: { params: Promise<{ sessionId?
   );
 }
 
-
-
-
 const ChatSkeleton = () => (
   <div className="space-y-10 pt-8 max-w-3xl mx-auto">
-    {/* Assistant Message 1 */}
     <div className="flex justify-start animate-pulse">
       <div className="w-full max-w-[88%] sm:max-w-[82%]">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-slate-100 rounded-full flex-shrink-0" />
+          <div className="w-8 h-8 bg-slate-100 rounded-full" />
           <div className="h-3.5 w-24 bg-slate-100 rounded" />
         </div>
         <div className="bg-white border border-slate-100 rounded-2xl rounded-bl-md px-6 py-6">
@@ -175,7 +180,6 @@ const ChatSkeleton = () => (
       </div>
     </div>
 
-    {/* User Message */}
     <div className="flex justify-end animate-pulse">
       <div className="w-full max-w-[85%] sm:max-w-[78%]">
         <div className="bg-teal-100 rounded-2xl rounded-br-md px-6 py-6">
@@ -183,24 +187,6 @@ const ChatSkeleton = () => (
             <div className="h-4 bg-teal-50 rounded w-4/5" />
             <div className="h-4 bg-teal-50 rounded w-full" />
             <div className="h-4 bg-teal-50 rounded w-3/4" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Assistant Message 2 */}
-    <div className="flex justify-start animate-pulse">
-      <div className="w-full max-w-[88%] sm:max-w-[82%]">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-slate-100 rounded-full flex-shrink-0" />
-          <div className="h-3.5 w-32 bg-slate-100 rounded" />
-        </div>
-        <div className="bg-white border border-slate-100 rounded-2xl rounded-bl-md px-6 py-6">
-          <div className="space-y-3">
-            <div className="h-4 bg-slate-100 rounded w-[95%]" />
-            <div className="h-4 bg-slate-100 rounded w-11/12" />
-            <div className="h-4 bg-slate-100 rounded w-3/4" />
-            <div className="h-4 bg-slate-100 rounded w-5/6" />
           </div>
         </div>
       </div>

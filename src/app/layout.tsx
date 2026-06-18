@@ -16,8 +16,25 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "MindBridge",
-  description: "Mental Wellness AI Chat App",
+  title: 'MindBridge | AI Mental Wellness',
+  description: 'Your safe space for reflection and AI-powered mental support.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  openGraph: {
+    type: 'website',
+    url: 'https://mindbridge.app',
+    title: 'MindBridge',
+    description: 'AI-driven mental health support and daily reflection.',
+    siteName: 'MindBridge',
+    images: [{
+      url: '/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'MindBridge App Preview',
+    }],
+  },
 };
 
 export default function RootLayout({
