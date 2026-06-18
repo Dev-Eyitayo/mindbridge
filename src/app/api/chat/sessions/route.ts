@@ -4,7 +4,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function GET(req: Request) {
-  // Pass authOptions to correctly retrieve the session
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.id) {
