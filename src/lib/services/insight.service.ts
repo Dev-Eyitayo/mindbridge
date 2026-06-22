@@ -1,10 +1,3 @@
-// src/lib/services/insight.service.ts
-// ============================================================
-// Insight Service
-// Generates and stores weekly AI insights from mood + chat data.
-// Designed to be called from an API route OR a future cron job.
-// ============================================================
-
 import OpenAI from "openai";
 import prisma from "@/lib/prisma";
 import { getMoodEntriesInRange } from "./mood.service";

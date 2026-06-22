@@ -1,9 +1,3 @@
-// src/lib/services/mood.service.ts
-// ============================================================
-// Mood Service
-// Encapsulates all mood-related database operations.
-// ============================================================
-
 import prisma from "@/lib/prisma";
 
 export type MoodType =

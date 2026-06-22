@@ -1,12 +1,3 @@
-// src/lib/services/specialist-recommendation.service.ts
-// ============================================================
-// Specialist Recommendation Service
-// Maps emotional patterns to specialist categories and fetches
-// relevant specialists from the database.
-// IMPORTANT: Never diagnoses users. All language uses "may benefit from",
-// "consider speaking with", or similar non-diagnostic framing.
-// ============================================================
-
 import prisma from "@/lib/prisma";
 
 /** Maps a dominant emotion to relevant specialist tags and a reason */

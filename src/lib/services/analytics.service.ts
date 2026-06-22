@@ -1,10 +1,3 @@
-// src/lib/services/analytics.service.ts
-// ============================================================
-// Analytics Service
-// Aggregates mood entries and message analyses to derive
-// patterns used for insights, dashboards, and recommendations.
-// ============================================================
-
 import prisma from "@/lib/prisma";
 
 /** Retrieve recent message analyses for a user */
@@ -84,7 +77,7 @@ export async function getStressScore(userId: string): Promise<StressScore> {
         message: { userId },
         createdAt: { gte: nDaysAgo(14), lt: nDaysAgo(7) },
       },
-      select: { riskLevel: true, intensity: true },
+      select: { riskLevel: true, intensity: true, emotion: true },
     }),
   ]);
 

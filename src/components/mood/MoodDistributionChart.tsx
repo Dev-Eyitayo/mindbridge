@@ -1,8 +1,5 @@
 "use client";
 
-// src/components/mood/MoodDistributionChart.tsx
-// Donut/pie chart showing mood type distribution using recharts
-
 import {
   PieChart,
   Pie,
@@ -63,7 +60,7 @@ export function MoodDistributionChart({ distribution }: Props) {
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number, name: string) => [value, name]}
+          formatter={(value: any, name: any) => [value, name]}
         />
         <Legend
           iconType="circle"

@@ -1,10 +1,3 @@
-// src/lib/services/ai-analysis.service.ts
-// ============================================================
-// AI Analysis Service
-// Keeps Groq AI logic out of route handlers.
-// Called after a user message is saved to infer emotion + risk.
-// ============================================================
-
 import OpenAI from "openai";
 
 const groq = new OpenAI({
