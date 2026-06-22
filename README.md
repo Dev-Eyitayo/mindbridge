@@ -1,36 +1,209 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MindBridge 🧠💙
+
+MindBridge is an AI-powered mental wellness platform designed to provide users with a safe space for reflection, emotional support, and mood tracking. It combines conversational AI with mood analytics to help users better understand their emotional patterns over time and connect with appropriate support resources when needed.
+
+## Features
+
+* 🤖 AI companion powered by Groq
+* 😊 Mood logging and tracking
+* 📈 Mood trends and insights
+* 💬 Persistent conversations
+* 🔐 Secure authentication with NextAuth
+* 📊 Analytics dashboard
+* 🩺 Specialist recommendations based on emotional patterns
+* 🧠 AI-generated wellness insights
+* 🌙 Responsive and modern UI
+
+> **Disclaimer:** MindBridge is intended to support mental wellness and self-awareness. It is not a substitute for professional medical advice, diagnosis, or treatment.
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* Next.js (App Router)
+* React
+* TypeScript
+* Tailwind CSS
+
+### Backend
+
+* Next.js Server Actions / API Routes
+* Prisma ORM
+* PostgreSQL
+* NextAuth
+
+### AI
+
+* Groq API
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+Make sure you have installed:
+
+* Node.js 18+
+* npm, pnpm, yarn, or bun
+* PostgreSQL
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/dev-eyitayo/mindbridge
+cd mindbridge
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the root directory and configure the required variables:
+
+```env
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+GROQ_API_KEY=
+DATABASE_URL = 
+```
+
+---
+
+## Database Setup
+
+Generate the Prisma client:
+
+```bash
+npx prisma generate
+```
+
+Run migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+Seed the database:
+
+```bash
+npx prisma db seed
+```
+
+---
+
+## Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application automatically reloads as changes are made.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+app/
+components/
+lib/
+prisma/
+public/
+types/
+hooks/
+services/
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The structure may evolve as new features are added.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Core Modules
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### AI Chat
+
+Users can engage in supportive conversations powered by Groq.
+
+### Mood Tracking
+
+Track moods, intensity levels, and emotional trends over time.
+
+### Insights
+
+Receive AI-generated summaries and wellness observations based on mood history.
+
+### Journal
+
+Maintain personal reflections and emotional notes.
+
+### Support & Specialists
+
+Discover therapists and mental health specialists based on emotional patterns and needs.
+
+---
+
+## Scripts
+
+Start development server:
+
+```bash
+npm run dev
+```
+
+Build the application:
+
+```bash
+npm run build
+```
+
+Run production server:
+
+```bash
+npm run start
+```
+
+Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+Run migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+Open Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+Seed database:
+
+```bash
+npx prisma db seed
+```
+
+---
+

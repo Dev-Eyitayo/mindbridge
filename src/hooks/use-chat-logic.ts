@@ -104,7 +104,7 @@ export function useChatLogic(sessionId?: string) {
           promoteDraftToSession(newSessionId);
           draftKeyRef.current = newSessionId;
 
-          router.replace(`/app/${newSessionId}`, { scroll: false });
+          router.replace(`/chat/${newSessionId}`, { scroll: false });
           triggerSidebarRefresh();
         }
 

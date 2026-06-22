@@ -53,7 +53,7 @@ export default function AuthPage() {
       }
 
       toast.success("Welcome back!");
-      router.push("/app");
+      router.push("/dashboard");
       router.refresh();
     } catch (err: any) {
       toast.error(err.message);

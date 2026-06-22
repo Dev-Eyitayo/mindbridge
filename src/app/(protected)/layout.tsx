@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import {
@@ -9,33 +9,43 @@ import {
   Plus,
   Menu,
   X,
-  History
+  History,
+  Smile,
+  HeartHandshake,
+  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import useSWR from 'swr';
-import { useChatStore, selectSidebarRefresh } from '@/store/useChatStore';
+import useSWR from "swr";
+import { useChatStore, selectSidebarRefresh } from "@/store/useChatStore";
 
-const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(res => res.json());
+const fetcher = (url: string) =>
+  fetch(url, { credentials: "include" }).then((res) => res.json());
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const params = useParams();
-  const currentSessionId = Array.isArray(params?.sessionId) ? params.sessionId[0] : undefined;
+  const currentSessionId = Array.isArray(params?.sessionId)
+    ? params.sessionId[0]
+    : undefined;
 
   const triggerRefresh = useChatStore(selectSidebarRefresh);
   const resetRefresh = useChatStore((state) => state.resetRefresh);
   const resetActiveChat = useChatStore((state) => state.resetActiveChat);
 
-  const { data, mutate } = useSWR('/api/chat/sessions', fetcher, {
+  const { data, mutate } = useSWR("/api/chat/sessions", fetcher, {
     refreshInterval: 4000,
-    revalidateOnFocus: true
+    revalidateOnFocus: true,
   });
 
   const sessions = Array.isArray(data) ? data : [];
 
-  // Listen for sidebar refresh (new chat titles)
   useEffect(() => {
     if (triggerRefresh) {
       mutate();
@@ -45,8 +55,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleCreateNewChat = () => {
     resetActiveChat();
-    router.push('/app');
+    router.push("/chat");
     setIsMobileDrawerOpen(false);
+  };
+
+  // Helper: active nav item style
+  const navItemClass = (href: string) => {
+    const isActive = pathname === href || (href !== "/chat" && pathname.startsWith(href));
+    return `flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${
+      isActive
+        ? "bg-teal-600/15 text-teal-300 font-medium"
+        : "hover:bg-slate-900 text-slate-400 hover:text-slate-200"
+    }`;
   };
 
   const SidebarContent = () => (
@@ -68,15 +88,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <nav
         className="flex-1 px-2 overflow-y-auto pb-6 sidebar-scroll"
-        style={{ scrollbarColor: '#334155 transparent', scrollbarWidth: 'thin' }}
+        style={{ scrollbarColor: "#334155 transparent", scrollbarWidth: "thin" }}
       >
-        <Link
-          href="/app"
-          onClick={resetActiveChat}
-          className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-900 rounded-lg transition-colors mb-8"
-        >
-          <LayoutDashboard size={18} /> Overview
-        </Link>
+        {/* ── Primary Navigation ── */}
+        <div className="px-1 mb-6">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3 px-3">
+            Menu
+          </div>
+          <Link
+            href="/dashboard"
+            className={navItemClass("/dashboard")}
+          >
+            <LayoutDashboard size={18} /> Dashboard
+          </Link>
+          {/* <Link
+            href="/chat"
+            onClick={resetActiveChat}
+            className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors mt-0.5 ${
+              pathname === "/chat" && !currentSessionId
+                ? "bg-teal-600/15 text-teal-300 font-medium"
+                : "hover:bg-slate-900 text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <MessageCircle size={18} /> Chat
+          </Link> */}
+          <Link
+            href="/mood"
+            className={navItemClass("/mood")}
+          >
+            <Smile size={18} /> Mood Tracker
+          </Link>
+          <Link
+            href="/support"
+            className={navItemClass("/support")}
+          >
+            <HeartHandshake size={18} /> Support
+          </Link>
+        </div>
 
         {/* === TODAY SECTION === */}
         <div className="px-1 mb-8">
@@ -91,11 +139,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 return (
                   <Link
                     key={s.id}
-                    href={`/app/${s.id}`}
+                    href={`/chat/${s.id}`}
                     className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
                       isActive
-                        ? 'bg-teal-600/15 text-teal-300 font-medium'
-                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-900'
+                        ? "bg-teal-600/15 text-teal-300 font-medium"
+                        : "text-slate-300 hover:text-slate-100 hover:bg-slate-900"
                     }`}
                   >
                     {s.title || "New Chat"}
@@ -118,11 +166,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 return (
                   <Link
                     key={s.id}
-                    href={`/app/${s.id}`}
+                    href={`/chat/${s.id}`}
                     className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
                       isActive
-                        ? 'bg-teal-600/15 text-teal-300 font-medium'
-                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-900'
+                        ? "bg-teal-600/15 text-teal-300 font-medium"
+                        : "text-slate-300 hover:text-slate-100 hover:bg-slate-900"
                     }`}
                   >
                     {s.title || "Untitled Chat"}
@@ -146,7 +194,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 
   return (
-
     <div className="h-screen flex bg-slate-50 overflow-hidden">
       {/* Mobile Menu Trigger */}
       <button

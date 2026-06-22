@@ -1,16 +1,18 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import OpenAI from 'openai';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import OpenAI from "openai";
+import { analyseMessage } from "@/lib/services/ai-analysis.service";
+
 
 const groq = new OpenAI({
-  baseURL: 'https://api.groq.com/openai/v1',
+  baseURL: "https://api.groq.com/openai/v1",
   apiKey: process.env.GROQ_API_KEY,
 });
 
 type Message = {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -110,14 +112,30 @@ export async function POST(req: Request) {
 
   const userMessage = messages[messages.length - 1];
 
-  // Save user message
-  await prisma.message.create({
+  const savedUserMessage = await prisma.message.create({
     data: {
       sessionId,
       role: "user",
       content: userMessage.content,
       userId,
     },
+  });
+
+
+  analyseMessage(userMessage.content).then(async (analysis) => {
+    if (!analysis) return;
+    try {
+      await prisma.messageAnalysis.create({
+        data: {
+          messageId: savedUserMessage.id,
+          emotion: analysis.emotion,
+          intensity: analysis.intensity,
+          riskLevel: analysis.riskLevel,
+        },
+      });
+    } catch (err) {
+      console.error("[Chat] Failed to save message analysis:", err);
+    }
   });
 
   const aiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -166,27 +184,17 @@ export async function POST(req: Request) {
           const titleCompletion = await groq.chat.completions.create({
             model: "llama-3.1-8b-instant",
             messages: [
-              {
-                role: "system",
-                content: titlePrompt,
-              },
-              {
-                role: "user",
-                content: userMessage.content,
-              },
+              { role: "system", content: titlePrompt },
+              { role: "user", content: userMessage.content },
             ],
             temperature: 0.7,
             max_tokens: 20,
           });
 
           let newTitle =
-            titleCompletion.choices[0]?.message?.content?.trim() ||
-            "New Chat";
+            titleCompletion.choices[0]?.message?.content?.trim() || "New Chat";
 
-          // Clean title
-          newTitle = newTitle
-            .replace(/^["']|["']$/g, "")
-            .trim();
+          newTitle = newTitle.replace(/^["']|["']$/g, "").trim();
 
           await prisma.chatSession.update({
             where: { id: sessionId },
