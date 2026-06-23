@@ -1,78 +1,54 @@
 import type { Metadata } from "next";
-import { Inter, DM_Serif_Display } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "../components/Providers";
 
-
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-geist-sans",
   display: "swap",
 });
 
-const dmSerifDisplay = DM_Serif_Display({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "MindBridge",
-    template: "%s — MindBridge",
-  },
-  description: "A safe, private space to reflect, track your emotions, and find support.",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
+  title: { default: "MindBridge", template: "%s · MindBridge" },
+  description: "A private space to reflect, track your mood, and find support.",
+  icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
   openGraph: {
     type: "website",
-    url: "https://mindbridge.app",
+    url: "https://mindbridge.pxxl.run",
     title: "MindBridge",
-    description: "AI-powered mental wellness: daily reflection, mood tracking, and specialist support.",
+    description: "AI-powered mental wellness. Private. Empathetic. Yours.",
     siteName: "MindBridge",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "MindBridge — Your mental wellness companion",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MindBridge",
-    description: "AI-powered mental wellness: daily reflection, mood tracking, and specialist support.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${dmSerifDisplay.variable} font-sans bg-background text-foreground antialiased`}
+        className={`${geist.variable} ${geistMono.variable}`}
+        style={{ fontFamily: "var(--font-geist-sans, var(--font-sans))" }}
       >
         <AuthProvider>
           <Toaster
             richColors
             position="top-center"
-            theme="system"
-            className="font-sans"
+            theme="light"
             toastOptions={{
               style: {
-                fontFamily: "var(--font-sans)",
-                fontSize: "14px",
-                borderRadius: "var(--radius-lg)",
+                fontFamily: "var(--font-geist-sans, system-ui)",
+                fontSize: "13px",
+                borderRadius: "10px",
                 border: "1px solid var(--border)",
+                boxShadow: "var(--shadow-lg)",
               },
             }}
           />

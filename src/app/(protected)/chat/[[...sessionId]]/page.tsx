@@ -1,47 +1,18 @@
-/**
- * src/app/(protected)/chat/[[...sessionId]]/page.tsx
- *
- * Design decisions:
- * - The chat background is `--background` (warm off-white), not cold `slate-50`.
- * - AI messages: no border. White card on warm background with subtle shadow.
- *   The absence of a border makes them feel calmer — less form-like, more editorial.
- * - User messages: `--primary-muted` (indigo-50) background with `--foreground` text.
- *   NOT a saturated indigo/teal blob. The message should feel like your words,
- *   not a notification badge. Still clearly differentiated from AI.
- * - Composer: the "signature element" — a floating pill container that lifts slightly
- *   on focus. `composer-input` class from globals.css applies the glow.
- *   The send button is a round icon inside the composer area (like Claude/ChatGPT),
- *   not a separate card outside.
- * - Typing indicator: redesigned as three small warm dots using `typing-dot` class.
- * - Empty state: personal greeting, sub-headline, three suggestion cards.
- *   Suggestions are plain cards, no icon-in-a-square-background visual noise.
- * - All business logic (useChatLogic, handleSubmit, auto-scroll) is preserved exactly.
- */
 "use client";
 
+import { use, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Sparkles, HeartPulse, Brain, ArrowUp } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ArrowUp, Brain, Heart, Sparkles } from "lucide-react";
 import { useChatLogic } from "@/hooks/use-chat-logic";
-import { useEffect, useRef, use } from "react";
 
-export default function ChatPage({
-  params,
-}: {
-  params: Promise<{ sessionId?: string[] }>;
-}) {
+export default function ChatPage({ params }: { params: Promise<{ sessionId?: string[] }> }) {
   const { data: session } = useSession();
-  const unwrappedParams = use(params);
-  const sessionId = unwrappedParams?.sessionId?.[0];
+  const { sessionId: sessionIdArr } = use(params);
+  const sessionId = sessionIdArr?.[0];
 
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    isHistoryLoading,
-  } = useChatLogic(sessionId);
+  const { messages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading } =
+    useChatLogic(sessionId);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const firstName = session?.user?.name?.split(" ")[0] || "there";
@@ -54,40 +25,33 @@ export default function ChatPage({
   };
 
   const suggestions = [
-    { icon: Brain,      text: "I'm feeling really overwhelmed with work today." },
-    { icon: HeartPulse, text: "I've been experiencing a lot of anxiety lately." },
-    { icon: Sparkles,   text: "I just want to reflect on my day." },
+    { icon: Sparkles, text: "I just need to vent about my day." },
+    { icon: Brain,    text: "I've been feeling really anxious lately." },
+    { icon: Heart,    text: "I want to reflect on something personal." },
   ];
 
-  const handleSuggestionClick = async (text: string) => {
+  const handleSuggestion = (text: string) => {
     handleInputChange({ target: { value: text } } as any);
-    setTimeout(async () => {
-      const fakeEvent = { preventDefault: () => {} } as any;
-      await handleSubmit(fakeEvent);
+    setTimeout(() => {
+      handleSubmit({ preventDefault: () => {} } as any);
     }, 0);
   };
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleInputChange(e);
     const el = e.target;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (input.trim() && !isLoading) {
-        const fakeEvent = { preventDefault: () => {} } as any;
-        handleSubmit(fakeEvent);
-      }
+      if (input.trim() && !isLoading) handleSubmit({ preventDefault: () => {} } as any);
     }
   };
 
@@ -95,68 +59,135 @@ export default function ChatPage({
   const showWelcome  = !showSkeleton && messages.length === 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+    <div
+      className="flex-1 flex flex-col h-full overflow-hidden"
+      style={{ background: "var(--bg-subtle)" }}
+    >
+      <div className="flex-1 overflow-y-auto scroll-thin" ref={scrollRef}>
+        <div className="w-full max-w-4xl mx-auto px-4 pt-8 pb-4">
 
-      {/* ── Message area ─────────────────────────────────────────── */}
-      <div
-        className="flex-1 overflow-y-auto chat-scroll"
-        ref={scrollRef}
-        style={{ paddingBottom: "0" }}
-      >
-        <div className="max-w-2xl mx-auto px-4 pt-8 pb-6">
+          {showSkeleton && <ChatSkeleton />}
 
-          {showSkeleton ? (
-            <ChatSkeleton />
-          ) : showWelcome ? (
-            <WelcomeScreen
-              greeting={getGreeting()}
-              firstName={firstName}
-              suggestions={suggestions}
-              onSuggestion={handleSuggestionClick}
-            />
-          ) : (
-            <div className="space-y-6 animate-fade-in">
+          {showWelcome && (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center fade-up">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6"
+                style={{ background: "var(--violet-light)" }}
+              >
+                <Sparkles size={22} style={{ color: "var(--violet)" }} />
+              </div>
+              <h1
+                className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3"
+                style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}
+              >
+                {getGreeting()}, {firstName}.
+              </h1>
+              <p className="text-[15px] mb-10 max-w-sm" style={{ color: "var(--text-secondary)" }}>
+                This is a safe space. What's on your mind today?
+              </p>
+
+              <div className="grid sm:grid-cols-3 gap-3 w-full">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSuggestion(s.text)}
+                    className="flex flex-col items-start p-4 rounded-xl text-left transition-all fade-up"
+                    style={{
+                      background:   "var(--card)",
+                      border:       "1px solid var(--border)",
+                      animationDelay: `${i * 60}ms`,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--violet-subtle)";
+                      e.currentTarget.style.background  = "var(--violet-light)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--border)";
+                      e.currentTarget.style.background  = "var(--card)";
+                    }}
+                  >
+                    <s.icon size={16} style={{ color: "var(--violet)", marginBottom: 10 }} />
+                    <span className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      {s.text}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!showSkeleton && !showWelcome && (
+            <div className="space-y-5 pb-2">
               {messages.map((m, i) => (
                 <div
                   key={m.id}
-                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
-                  style={{ animationDelay: `${Math.min(i * 20, 200)}ms` }}
+                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} fade-up`}
+                  style={{ animationDelay: `${Math.min(i * 15, 150)}ms` }}
                 >
+                  {/* AI avatar */}
                   {m.role === "assistant" && (
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mr-2.5 mt-1 shrink-0">
-                      <Sparkles size={12} className="text-primary" />
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+                      style={{ background: "var(--violet-light)" }}
+                    >
+                      <Sparkles size={13} style={{ color: "var(--violet)" }} />
                     </div>
                   )}
+
                   <div
-                    className={`
-                      max-w-[80%] px-4 py-3 text-sm leading-relaxed
-                      ${m.role === "user"
-                        ? "bg-primary-muted text-foreground rounded-xl rounded-br-sm"
-                        : "bg-surface text-foreground rounded-xl rounded-bl-sm shadow-xs border border-border"
-                      }
-                    `}
+                    className="max-w-[82%] sm:max-w-[75%] px-4 py-3 text-sm rounded-2xl"
+                    style={m.role === "user" ? {
+                      background: "var(--violet-light)",
+                      color:      "var(--text-primary)",
+                      borderBottomRightRadius: 4,
+                    } : {
+                      background: "var(--card)",
+                      border:     "1px solid var(--border)",
+                      color:      "var(--text-primary)",
+                      boxShadow:  "var(--shadow-xs)",
+                      borderBottomLeftRadius: 4,
+                    }}
                   >
                     {m.role === "assistant" ? (
-                      <div className="chat-prose">
+                      <div className="prose-chat" style={{ lineHeight: 1.65 }}>
                         <ReactMarkdown>{m.content}</ReactMarkdown>
                       </div>
                     ) : (
-                      <p>{m.content}</p>
+                      <p style={{ lineHeight: 1.65 }}>{m.content}</p>
                     )}
                   </div>
                 </div>
               ))}
 
+              {/* Typing indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mr-2.5 mt-1 shrink-0">
-                    <Sparkles size={12} className="text-primary" />
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+                    style={{ background: "var(--violet-light)" }}
+                  >
+                    <Sparkles size={13} style={{ color: "var(--violet)" }} />
                   </div>
-                  <div className="bg-surface border border-border rounded-xl rounded-bl-sm px-4 py-3 shadow-xs">
-                    <div className="flex gap-1.5 items-center h-5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-muted typing-dot" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-muted typing-dot" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-muted typing-dot" />
+                  <div
+                    className="px-4 py-3.5 rounded-2xl"
+                    style={{
+                      background: "var(--card)",
+                      border:     "1px solid var(--border)",
+                      boxShadow:  "var(--shadow-xs)",
+                      borderBottomLeftRadius: 4,
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      {[0,1,2].map((i) => (
+                        <span
+                          key={i}
+                          className="typing-dot block w-1.5 h-1.5 rounded-full"
+                          style={{
+                            background:      "var(--text-tertiary)",
+                            animationDelay:  `${i * 0.2}s`,
+                          }}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -166,46 +197,51 @@ export default function ChatPage({
         </div>
       </div>
 
-      {/* ── Composer ─────────────────────────────────────────────── */}
-      <div className="shrink-0 bg-background px-4 pb-6 pt-4">
-        <div className="max-w-2xl mx-auto">
+      <div
+        className="shrink-0 px-4 py-4"
+        style={{
+          background:  "var(--bg)",
+          borderTop:   "1px solid var(--border)",
+        }}
+      >
+        <div className="w-full max-w-2xl mx-auto">
           <form
             onSubmit={handleSubmit}
-            className="relative bg-surface border border-border rounded-xl shadow-sm"
+            className="relative rounded-xl overflow-hidden"
+            style={{
+              background: "var(--card)",
+              border:     "1px solid var(--border)",
+              boxShadow:  "var(--shadow-sm)",
+            }}
           >
             <textarea
               value={input}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
+              onChange={handleTextarea}
+              onKeyDown={handleKey}
               placeholder="Share what's on your mind…"
               rows={1}
-              className="
-                composer-input w-full resize-none bg-transparent
-                py-3.5 pl-4 pr-14 text-sm text-foreground
-                placeholder:text-subtle rounded-xl
-                focus:outline-none
-                max-h-[180px] overflow-y-auto
-                leading-relaxed
-              "
-              style={{ scrollbarWidth: "none" }}
+              className="w-full resize-none bg-transparent text-sm outline-none leading-relaxed scroll-thin"
+              style={{
+                padding:   "14px 52px 14px 16px",
+                color:     "var(--text-primary)",
+                maxHeight: "180px",
+              }}
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              aria-label="Send message"
-              className="
-                absolute right-2.5 bottom-2.5
-                w-8 h-8 flex items-center justify-center
-                bg-primary hover:bg-primary-hover
-                disabled:bg-border disabled:cursor-not-allowed
-                text-white rounded-lg
-                transition-colors duration-fast
-              "
+              aria-label="Send"
+              className={`absolute right-2.5 bottom-2.5 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${isLoading ? "btn-send-loading" : ""}`}
+              style={{
+                background: (isLoading || !input.trim()) ? "var(--bg-muted)" : "var(--violet)",
+                color:      (isLoading || !input.trim()) ? "var(--text-tertiary)" : "white",
+                cursor:     (isLoading || !input.trim()) ? "not-allowed" : "pointer",
+              }}
             >
               <ArrowUp size={16} strokeWidth={2.5} />
             </button>
           </form>
-          <p className="text-center text-[11px] text-subtle mt-2.5">
+          <p className="text-center text-[11px] mt-2.5" style={{ color: "var(--text-tertiary)" }}>
             MindBridge is not a substitute for professional mental health support.
           </p>
         </div>
@@ -214,85 +250,77 @@ export default function ChatPage({
   );
 }
 
-/* ── Welcome screen ──────────────────────────────────────────────────────── */
-
-function WelcomeScreen({
-  greeting,
-  firstName,
-  suggestions,
-  onSuggestion,
-}: {
-  greeting: string;
-  firstName: string;
-  suggestions: { icon: React.ElementType; text: string }[];
-  onSuggestion: (text: string) => void;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[65vh] text-center animate-fade-in">
-      <h1 className="font-display text-4xl md:text-5xl font-normal text-foreground mb-3 tracking-tight">
-        {greeting}, {firstName}.
-      </h1>
-      <p className="text-muted text-base mb-12 max-w-sm">
-        This is a safe, private space. How are you feeling today?
-      </p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-xl stagger">
-        {suggestions.map((s, i) => (
-          <button
-            key={i}
-            onClick={() => onSuggestion(s.text)}
-            className="
-              flex flex-col items-start p-4 text-left
-              bg-surface border border-border hover:border-border-strong
-              rounded-lg shadow-xs hover:shadow-sm
-              transition-all duration-fast animate-fade-in
-            "
-          >
-            <s.icon size={18} className="text-muted mb-2.5" strokeWidth={1.75} />
-            <span className="text-xs text-muted leading-relaxed">"{s.text}"</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Chat skeleton ───────────────────────────────────────────────────────── */
 
 function ChatSkeleton() {
   return (
-    <div className="space-y-8 pt-8 animate-pulse">
+    <div className="space-y-6 pb-2">
       {/* AI message skeleton */}
-      <div className="flex justify-start gap-2.5">
-        <div className="w-6 h-6 rounded-full bg-border shrink-0 mt-1" />
-        <div className="max-w-[75%] bg-surface border border-border rounded-xl rounded-bl-sm px-4 py-3">
-          <div className="space-y-2.5">
-            <div className="h-3 bg-border rounded w-full" />
-            <div className="h-3 bg-border rounded w-11/12" />
-            <div className="h-3 bg-border rounded w-4/5" />
+      <div className="flex justify-start">
+        <div className="skeleton w-7 h-7 rounded-lg shrink-0 mr-2.5 mt-0.5" style={{ borderRadius: 8 }} />
+        <div
+          className="w-full max-w-[82%] sm:max-w-[75%] rounded-2xl overflow-hidden"
+          style={{
+            background:            "var(--card)",
+            border:                "1px solid var(--border)",
+            borderBottomLeftRadius: 4,
+            boxShadow:             "var(--shadow-xs)",
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[92%]" />
+            <div className="skeleton h-3.5 w-[78%]" />
+            <div className="skeleton h-3.5 w-[85%]" />
           </div>
         </div>
       </div>
 
-      {/* User message skeleton */}
       <div className="flex justify-end">
-        <div className="max-w-[65%] bg-primary-muted rounded-xl rounded-br-sm px-4 py-3">
-          <div className="space-y-2.5">
-            <div className="h-3 bg-primary-subtle/40 rounded w-3/4" />
-            <div className="h-3 bg-primary-subtle/40 rounded w-full" />
+        <div
+          className="w-full max-w-[70%] sm:max-w-[60%] rounded-2xl overflow-hidden"
+          style={{
+            background:             "var(--violet-light)",
+            borderBottomRightRadius: 4,
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-[88%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-full"  style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-[65%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
           </div>
         </div>
       </div>
 
-      {/* AI response skeleton */}
-      <div className="flex justify-start gap-2.5">
-        <div className="w-6 h-6 rounded-full bg-border shrink-0 mt-1" />
-        <div className="max-w-[80%] bg-surface border border-border rounded-xl rounded-bl-sm px-4 py-3">
-          <div className="space-y-2.5">
-            <div className="h-3 bg-border rounded w-full" />
-            <div className="h-3 bg-border rounded w-10/12" />
-            <div className="h-3 bg-border rounded w-full" />
-            <div className="h-3 bg-border rounded w-7/12" />
+
+      <div className="flex justify-start">
+        <div className="skeleton w-7 h-7 rounded-lg shrink-0 mr-2.5 mt-0.5" style={{ borderRadius: 8 }} />
+        <div
+          className="w-full max-w-[82%] sm:max-w-[75%] rounded-2xl overflow-hidden"
+          style={{
+            background:            "var(--card)",
+            border:                "1px solid var(--border)",
+            borderBottomLeftRadius: 4,
+            boxShadow:             "var(--shadow-xs)",
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-[95%]" />
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[88%]" />
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[55%]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <div
+          className="w-full max-w-[55%] sm:max-w-[45%] rounded-2xl overflow-hidden"
+          style={{ background: "var(--violet-light)", borderBottomRightRadius: 4 }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-full"  style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-[72%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
           </div>
         </div>
       </div>

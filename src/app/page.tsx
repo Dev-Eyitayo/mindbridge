@@ -2,160 +2,203 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Brain, HeartPulse, ShieldCheck, ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, Brain, HeartPulse, ShieldCheck, X, Menu, Sparkles } from "lucide-react";
 
 export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
+    <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text-primary)" }}>
 
-      {/* ── Navigation ─────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="font-display text-xl font-normal text-foreground tracking-tight">
-            MindBridge
+
+      <header
+        className="sticky top-0 z-40 w-full"
+        style={{
+          borderBottom: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span
+              className="w-6 h-6 rounded-md flex items-center justify-center"
+              style={{ background: "var(--violet)" }}
+            >
+              <Sparkles size={13} color="white" />
+            </span>
+            <span className="font-semibold text-[15px] tracking-tight" style={{ color: "var(--text-primary)" }}>
+              MindBridge
+            </span>
           </div>
 
-          {/* Desktop */}
-          <div className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-1">
             <Link
               href="/login"
-              className="text-sm text-muted hover:text-foreground transition-colors duration-fast font-medium"
+              className="px-3 py-1.5 text-sm rounded-md transition-colors"
+              style={{ color: "var(--text-secondary)" }}
             >
               Sign in
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-fg text-sm font-medium rounded-DEFAULT hover:bg-primary-hover transition-colors duration-fast shadow-xs"
+              className="px-3.5 py-1.5 text-sm font-medium rounded-md transition-all"
+              style={{
+                background: "var(--violet)",
+                color: "white",
+              }}
+            >
+              Get started
+            </Link>
+          </nav>
+
+          <button
+            className="md:hidden p-2 rounded-md"
+            style={{ color: "var(--text-secondary)" }}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menu"
+          >
+            {menuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+
+        {/* Mobile nav */}
+        {menuOpen && (
+          <div
+            className="md:hidden px-5 pb-4 pt-2 flex flex-col gap-2"
+            style={{ borderTop: "1px solid var(--border)" }}
+          >
+            <Link href="/login" className="py-2.5 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+              Sign in
+            </Link>
+            <Link
+              href="/login"
+              className="py-2.5 px-4 text-sm font-medium rounded-md text-center"
+              style={{ background: "var(--violet)", color: "white" }}
             >
               Get started
             </Link>
           </div>
+        )}
+      </header>
 
-          {/* Mobile toggle */}
-          <button
-            className="md:hidden p-2 rounded-DEFAULT text-muted hover:text-foreground hover:bg-surface-hover transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+
+      <section className="max-w-5xl mx-auto px-5 pt-24 pb-20 text-center fade-up">
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium mb-8"
+          style={{
+            background: "var(--violet-light)",
+            color: "var(--violet)",
+            border: "1px solid var(--violet-subtle)",
+          }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--violet)" }} />
+          AI-powered mental wellness
         </div>
-      </nav>
 
-      {/* Mobile full-screen drawer */}
-      <div
-        className={`fixed inset-0 z-40 bg-surface flex flex-col items-center justify-center gap-8 transition-opacity duration-normal
-          ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      >
-        <Link
-          href="/login"
-          className="text-2xl font-display text-foreground"
-          onClick={() => setIsMenuOpen(false)}
+        <h1
+          className="text-5xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] mb-6"
+          style={{ color: "var(--text-primary)", letterSpacing: "-0.03em" }}
         >
-          Sign in
-        </Link>
-        <Link
-          href="/login"
-          className="px-8 py-4 bg-primary text-primary-fg text-lg font-medium rounded-DEFAULT"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          Get started
-        </Link>
-      </div>
-
-      {/* ── Hero ───────────────────────────────────────────────────── */}
-      <main className="max-w-6xl mx-auto px-6 pt-24 pb-28 text-center">
-
-        <p className="text-sm font-medium text-muted tracking-wide uppercase mb-6 font-sans">
-          Mental wellness, reimagined
-        </p>
-
-        <h1 className="font-display text-5xl md:text-7xl font-normal text-foreground mb-8 tracking-tight leading-[1.05]">
-          Your thoughts,<br className="hidden md:block" />{" "}
-          <span className="italic text-muted">understood.</span>
+          Feel heard.
+          <br />
+          <span style={{ color: "var(--violet)" }}>Get clarity.</span>
         </h1>
 
-        <p className="text-lg md:text-xl text-muted mb-12 max-w-[480px] mx-auto leading-relaxed">
-          A private, non-judgmental space to reflect, track your emotions,
-          and find clarity — powered by empathetic AI.
-        </p>
-
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-primary text-primary-fg text-base font-medium rounded-DEFAULT hover:bg-primary-hover transition-colors duration-fast shadow-sm"
+        <p
+          className="text-lg sm:text-xl max-w-md mx-auto mb-10 leading-relaxed"
+          style={{ color: "var(--text-secondary)" }}
         >
-          Start for free <ArrowRight size={16} strokeWidth={2} />
-        </Link>
-
-        <p className="mt-5 text-xs text-subtle">
-          No credit card required · Completely private
+          A private space to reflect, track your emotions, and understand yourself better — with an AI companion that listens.
         </p>
-      </main>
 
-      {/* ── Features ───────────────────────────────────────────────── */}
-      <section className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <div className="grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border">
-            <FeatureCard
-              icon={<Brain size={20} />}
-              title="Empathetic AI"
-              desc="Conversations designed to listen first. MindBridge reflects, never lectures."
-            />
-            <FeatureCard
-              icon={<HeartPulse size={20} />}
-              title="Mood tracking"
-              desc="Log how you feel daily. Watch patterns emerge over days, weeks, and months."
-            />
-            <FeatureCard
-              icon={<ShieldCheck size={20} />}
-              title="Private by default"
-              desc="Your reflections belong to you. Your data is encrypted and never shared."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ── Disclaimer ─────────────────────────────────────────────── */}
-      <section className="border-t border-border bg-background-alt">
-        <div className="max-w-3xl mx-auto px-6 py-10 text-center">
-          <p className="text-sm text-subtle leading-relaxed">
-            MindBridge supports self-reflection and emotional awareness.
-            It is not a substitute for professional medical advice, diagnosis, or treatment.
-            If you are in crisis, please reach out to a mental health professional immediately.
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all w-full sm:w-auto justify-center"
+            style={{ background: "var(--violet)", color: "white", boxShadow: "0 1px 2px rgba(124,58,237,0.3)" }}
+          >
+            Start for free <ArrowRight size={15} />
+          </Link>
+          <p className="text-xs sm:ml-2" style={{ color: "var(--text-tertiary)" }}>
+            No credit card required
           </p>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between text-xs text-subtle">
-          <span>© 2026 MindBridge</span>
-          <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-muted transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-muted transition-colors">Terms</Link>
+
+      <section style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Brain size={18} />,
+                title: "Empathetic AI",
+                desc: "Conversations that listen first. MindBridge reflects, never lectures or diagnoses.",
+              },
+              {
+                icon: <HeartPulse size={18} />,
+                title: "Mood tracking",
+                desc: "Log how you feel daily. Spot patterns across days, weeks, and months.",
+              },
+              {
+                icon: <ShieldCheck size={18} />,
+                title: "Private by default",
+                desc: "Your reflections belong to you alone. Never shared, never sold.",
+              },
+            ].map((f, i) => (
+              <div
+                key={i}
+                className="fade-up"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
+                  style={{ background: "var(--violet-light)", color: "var(--violet)" }}
+                >
+                  {f.icon}
+                </div>
+                <h3 className="font-semibold text-[15px] mb-2" style={{ color: "var(--text-primary)" }}>
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      <section style={{ borderTop: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
+        <div className="max-w-3xl mx-auto px-5 py-8 text-center">
+          <p className="text-xs leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
+            MindBridge is not a substitute for professional mental health care.
+            If you are in crisis, please contact a licensed professional immediately.
+          </p>
+        </div>
+      </section>
+
+
+      <footer style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="max-w-6xl mx-auto px-5 h-12 flex items-center justify-between">
+          <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>© 2026 MindBridge</span>
+          <div className="flex items-center gap-5">
+            {["Privacy", "Terms"].map((l) => (
+              <Link
+                key={l}
+                href={`/${l.toLowerCase()}`}
+                className="text-xs transition-colors"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                {l}
+              </Link>
+            ))}
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="px-8 py-10 first:pl-0 last:pr-0 md:first:pl-0 md:last:pr-0">
-      <div className="text-primary mb-5">{icon}</div>
-      <h3 className="font-display text-lg font-normal text-foreground mb-2">{title}</h3>
-      <p className="text-sm text-muted leading-relaxed">{desc}</p>
     </div>
   );
 }
