@@ -3,11 +3,13 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname === "/";
+    const token    = req.nextauth.token;
+    const isAuth   = !!token;
+    const pathname = req.nextUrl.pathname;
 
-    if (isAuth && isAuthPage) {
+    const isPublicPage = pathname === "/" || pathname === "/login";
+
+    if (isAuth && isPublicPage) {
       return NextResponse.redirect(new URL("/chat", req.url));
     }
 
@@ -16,12 +18,15 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        if (req.nextUrl.pathname === "/") return true;
+        const pathname = req.nextUrl.pathname;
+        // Public pages are always accessible
+        if (pathname === "/" || pathname === "/login") return true;
+        // Everything else requires auth
         return !!token;
       },
     },
     pages: {
-      signIn: "/",
+      signIn: "/login",
     },
   }
 );
@@ -29,9 +34,10 @@ export default withAuth(
 export const config = {
   matcher: [
     "/",
+    "/login",
     "/chat/:path*",
     "/dashboard/:path*",
+    "/mood/:path*",
     "/support/:path*",
-    "/mood/:path*"
   ],
 };

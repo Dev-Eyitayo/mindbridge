@@ -1,39 +1,53 @@
 import type { Metadata } from "next";
-import { Nunito, Playfair_Display } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "../components/Providers";
 
-const nunito = Nunito({ 
+
+const inter = Inter({
   subsets: ["latin"],
-  variable: '--font-nunito' 
+  variable: "--font-sans",
+  display: "swap",
 });
 
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  style: ['normal', 'italic'],
-  variable: '--font-playfair' 
+const dmSerifDisplay = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'MindBridge | AI Mental Wellness',
-  description: 'Your safe space for reflection and AI-powered mental support.',
+  title: {
+    default: "MindBridge",
+    template: "%s — MindBridge",
+  },
+  description: "A safe, private space to reflect, track your emotions, and find support.",
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    type: 'website',
-    url: 'https://mindbridge.app',
-    title: 'MindBridge',
-    description: 'AI-driven mental health support and daily reflection.',
-    siteName: 'MindBridge',
-    images: [{
-      url: '/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'MindBridge App Preview',
-    }],
+    type: "website",
+    url: "https://mindbridge.app",
+    title: "MindBridge",
+    description: "AI-powered mental wellness: daily reflection, mood tracking, and specialist support.",
+    siteName: "MindBridge",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "MindBridge — Your mental wellness companion",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MindBridge",
+    description: "AI-powered mental wellness: daily reflection, mood tracking, and specialist support.",
   },
 };
 
@@ -43,11 +57,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${nunito.variable} ${playfair.variable} font-sans bg-slate-50 text-slate-900`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${dmSerifDisplay.variable} font-sans bg-background text-foreground antialiased`}
+      >
         <AuthProvider>
-          {/* THE TOASTER MUST BE HERE */}
-          <Toaster richColors position="top-center" theme="light" className="font-sans" />
+          <Toaster
+            richColors
+            position="top-center"
+            theme="system"
+            className="font-sans"
+            toastOptions={{
+              style: {
+                fontFamily: "var(--font-sans)",
+                fontSize: "14px",
+                borderRadius: "var(--radius-lg)",
+                border: "1px solid var(--border)",
+              },
+            }}
+          />
           {children}
         </AuthProvider>
       </body>

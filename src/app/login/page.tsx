@@ -34,12 +34,8 @@ export default function AuthPage() {
         });
 
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong during registration.");
-        }
-        
-        toast.success("Account created successfully!");
+        if (!res.ok) throw new Error(data.error || "Something went wrong during registration.");
+        toast.success("Account created.");
       }
 
       const result = await signIn("credentials", {
@@ -48,12 +44,10 @@ export default function AuthPage() {
         password: form.password,
       });
 
-      if (result?.error) {
-        throw new Error("Invalid email or password");
-      }
+      if (result?.error) throw new Error("Invalid email or password.");
 
-      toast.success("Welcome back!");
-      router.push("/dashboard");
+      toast.success("Welcome back.");
+      router.push("/chat");
       router.refresh();
     } catch (err: any) {
       toast.error(err.message);
@@ -63,73 +57,191 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <div className="hidden lg:flex w-[420px] bg-gradient-to-br from-slate-900 to-slate-800 flex-col p-12 relative overflow-hidden">
-        <div className="absolute w-[300px] h-[300px] bg-teal-500 rounded-full blur-[80px] opacity-20 -bottom-12 -right-20" />
-        <div className="absolute w-[200px] h-[200px] bg-emerald-500 rounded-full blur-[80px] opacity-20 top-24 -left-16" />
+    <div className="min-h-screen flex bg-background">
 
-        <div className="relative z-10 flex-1 flex flex-col">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center text-xl shadow-md">🌿</div>
-            <div className="font-serif text-2xl font-bold text-white">MindBridge<span className="text-teal-400">.</span></div>
-          </div>
+      {/* ── Left panel ─────────────────────────────────────────────── */}
+      <div
+        className="hidden lg:flex w-[420px] shrink-0 flex-col justify-between p-12 relative overflow-hidden"
+        style={{
+          background: "radial-gradient(ellipse 80% 60% at 10% 90%, #1e1b4b 0%, #0f0e17 100%)",
+        }}
+      >
+        {/* Logo */}
+        <div className="font-display text-xl font-normal text-white/90 tracking-tight">
+          MindBridge
+        </div>
 
-          <div className="mt-auto font-serif text-[22px] italic text-slate-300 leading-relaxed">
+        {/* Quote */}
+        <div>
+          <blockquote className="font-display text-[22px] font-normal italic text-white/70 leading-relaxed mb-5">
             "You don't have to control your thoughts. You just have to stop letting them control you."
-            <div className="text-slate-500 text-sm mt-4 font-sans not-italic">— Dan Millman</div>
-          </div>
+          </blockquote>
+          <cite className="text-white/35 text-sm font-sans not-italic tracking-wide">
+            — Dan Millman
+          </cite>
         </div>
       </div>
 
+      {/* ── Right panel ────────────────────────────────────────────── */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white rounded-3xl p-10 shadow-sm border-1 border-slate-100">
-          <h1 className="font-serif text-3xl font-bold text-slate-900 mb-2 tracking-tight">
-            {mode === "login" ? "Welcome back" : "Create account"}
-          </h1>
-          <p className="text-slate-500 text-sm mb-8 font-sans">
-            {mode === "login"
-              ? "Sign in to your MindBridge account"
-              : "Join our wellness community today"}
-          </p>
+        <div className="w-full max-w-[440px] animate-fade-in">
+
+          {/* Mobile-only logo */}
+          <div className="lg:hidden font-display text-2xl font-normal text-foreground mb-10 tracking-tight">
+            MindBridge
+          </div>
+
+          <div className="mb-8">
+            <h1 className="font-display text-[30px] font-normal text-foreground tracking-tight">
+              {mode === "login" ? "Welcome back" : "Create account"}
+            </h1>
+            <p className="text-sm text-muted mt-1.5">
+              {mode === "login"
+                ? "Sign in to continue to MindBridge."
+                : "Join the MindBridge community."}
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">First Name</label>
-                  <input required name="firstName" value={form.firstName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Amara" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Last Name</label>
-                  <input required name="lastName" value={form.lastName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Obi" />
-                </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="First name">
+                  <Input
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleChange}
+                    placeholder="Amara"
+                    required
+                    autoComplete="given-name"
+                  />
+                </Field>
+                <Field label="Last name">
+                  <Input
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleChange}
+                    placeholder="Obi"
+                    required
+                    autoComplete="family-name"
+                  />
+                </Field>
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Email Address</label>
-              <input required type="email" name="email" value={form.email} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="you@example.com" />
-            </div>
+            <Field label="Email address">
+              <Input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                required
+                autoComplete="email"
+              />
+            </Field>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Password</label>
-              <input required type="password" name="password" value={form.password} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="••••••••" />
-            </div>
+            <Field label="Password">
+              <Input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+              />
+            </Field>
 
-            <button disabled={loading} type="submit" className="font-sans w-full p-4 mt-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-white font-bold transition-all shadow-sm disabled:opacity-70">
-              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-2 bg-primary hover:bg-primary-hover text-primary-fg text-sm font-medium rounded-DEFAULT transition-colors duration-fast shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading
+                ? "Please wait…"
+                : mode === "login"
+                ? "Sign in"
+                : "Create account"}
             </button>
           </form>
 
-          <div className="text-center mt-8 text-slate-500 text-sm font-sans">
+          <p className="text-center mt-8 text-sm text-muted">
             {mode === "login" ? (
-              <>New here? <button onClick={() => setMode("signup")} className="text-teal-600 font-bold hover:underline">Create account</button></>
+              <>
+                New to MindBridge?{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("signup")}
+                  className="text-primary hover:text-primary-hover font-medium transition-colors"
+                >
+                  Create account
+                </button>
+              </>
             ) : (
-              <>Have an account? <button onClick={() => setMode("login")} className="text-teal-600 font-bold hover:underline">Sign in</button></>
+              <>
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("login")}
+                  className="text-primary hover:text-primary-hover font-medium transition-colors"
+                >
+                  Sign in
+                </button>
+              </>
             )}
-          </div>
+          </p>
+
+          <p className="text-center mt-6 text-xs text-subtle">
+            By continuing, you agree to our{" "}
+            <a href="/terms" className="underline hover:text-muted transition-colors">
+              Terms
+            </a>{" "}
+            and{" "}
+            <a href="/privacy" className="underline hover:text-muted transition-colors">
+              Privacy Policy
+            </a>
+            .
+          </p>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ── Primitives ──────────────────────────────────────────────────────────── */
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-medium text-muted tracking-wide">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function Input({
+  className,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className={`
+        w-full px-3.5 py-2.5 text-sm text-foreground
+        bg-background-alt placeholder:text-subtle
+        border border-border rounded-DEFAULT
+        focus:bg-surface focus:border-border-focus focus:ring-4 focus:ring-primary/8
+        outline-none transition-all duration-fast
+        ${className ?? ""}
+      `}
+      {...props}
+    />
   );
 }

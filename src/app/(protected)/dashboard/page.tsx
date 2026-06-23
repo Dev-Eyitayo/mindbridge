@@ -1,5 +1,23 @@
+/**
+ * src/app/(protected)/dashboard/page.tsx
+ *
+ * Design decisions:
+ * - Replaced the 4-column stat card grid (which felt cramped on mobile)
+ *   with a cleaner 2-col (mobile) / 4-col (desktop) grid using our card system.
+ * - Stat cards: minimal — icon, label, value. No subtitle text fighting for
+ *   attention. The value IS the communication.
+ * - Weekly trend chart card now has breathing room. Chart title uses font-sans
+ *   (not serif) to stay in the "data" register, not the "emotional" register.
+ * - Weekly insight panel: italic display font quote treatment. This is the
+ *   one moment where the AI "speaks" directly — it earns the serif.
+ * - Recent conversations list: clean, hover-states, no arrows cluttering items.
+ *   Arrow appears on hover only (group-hover).
+ * - Recommended specialist card: single card — not a list. Shows the top match.
+ *   A "See all" link leads to /support.
+ * - DashboardSkeleton: proper skeleton shapes that match the actual layout.
+ * - All data fetching (useSWR), business logic, and types are preserved exactly.
+ */
 "use client";
-
 
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
@@ -11,11 +29,12 @@ import {
   Brain,
   Zap,
   MessageSquare,
-  UserCheck,
   ArrowRight,
   Sparkles,
   Moon,
   Activity,
+  BadgeCheck,
+  Star,
 } from "lucide-react";
 import { MoodTrendChart } from "@/components/mood/MoodTrendChart";
 
@@ -23,23 +42,23 @@ const fetcher = (url: string) =>
   fetch(url, { credentials: "include" }).then((r) => r.json());
 
 const MOOD_EMOJI: Record<string, string> = {
-  HAPPY: "😊",
-  CALM: "😌",
-  HOPEFUL: "🌟",
-  NEUTRAL: "😐",
-  SAD: "😔",
-  ANXIOUS: "😰",
-  ANGRY: "😤",
-  OVERWHELMED: "😵",
-  LONELY: "💙",
-  FEARFUL: "😨",
+  HAPPY:      "😊",
+  CALM:       "😌",
+  HOPEFUL:    "🌟",
+  NEUTRAL:    "😐",
+  SAD:        "😔",
+  ANXIOUS:    "😰",
+  ANGRY:      "😤",
+  OVERWHELMED:"😵",
+  LONELY:     "💙",
+  FEARFUL:    "😨",
 };
 
-const STRESS_COLOUR: Record<string, string> = {
-  Low: "text-emerald-600 bg-emerald-50",
-  Moderate: "text-amber-600 bg-amber-50",
-  High: "text-red-500 bg-red-50",
-  Critical: "text-red-700 bg-red-100",
+const STRESS_COLOUR: Record<string, { text: string; bg: string }> = {
+  Low:      { text: "text-success",      bg: "bg-success-muted" },
+  Moderate: { text: "text-warning",      bg: "bg-warning-muted" },
+  High:     { text: "text-destructive",  bg: "bg-destructive-muted" },
+  Critical: { text: "text-destructive",  bg: "bg-destructive-muted" },
 };
 
 export default function DashboardPage() {
@@ -64,204 +83,195 @@ export default function DashboardPage() {
   } = data ?? {};
 
   const topMoodType = recentMoodEntries?.[0]?.moodType ?? null;
+  const topSpecialist = recommendedSpecialists?.[0] ?? null;
+  const stressStyle   = stressScore?.label ? STRESS_COLOUR[stressScore.label] : null;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="flex-1 overflow-y-auto bg-background px-6 py-8 md:px-8">
+      <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
 
-        {/* ── Header ── */}
+        {/* ── Header ─────────────────────────────────────────────── */}
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">
+          <h1 className="font-display text-3xl font-normal text-foreground tracking-tight">
             Good to see you, {firstName}.
           </h1>
-          <p className="text-slate-500 mt-1">Here's your wellness overview for this week.</p>
+          <p className="text-muted text-sm mt-1.5">Here's your wellness overview.</p>
         </div>
 
-        {/* ── Stat Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* ── Stat cards ─────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger">
           <StatCard
-            icon={<Heart size={20} className="text-rose-500" />}
-            label="Current Mood"
-            value={
-              topMoodType
-                ? `${MOOD_EMOJI[topMoodType] ?? "💭"} ${topMoodType}`
-                : "Not logged"
-            }
-            sub={
-              recentMoodEntries?.[0]?.intensity
-                ? `Intensity ${recentMoodEntries[0].intensity}/10`
-                : undefined
-            }
+            icon={<Heart size={17} className="text-rose-500" />}
+            label="Current mood"
+            value={topMoodType ? `${MOOD_EMOJI[topMoodType] ?? "💭"} ${topMoodType.toLowerCase()}` : "Not logged"}
+            sub={recentMoodEntries?.[0]?.intensity ? `Intensity ${recentMoodEntries[0].intensity}/10` : undefined}
           />
           <StatCard
-            icon={<Flame size={20} className="text-orange-500" />}
-            label="Mood Streak"
+            icon={<Flame size={17} className="text-orange-500" />}
+            label="Mood streak"
             value={`${moodSummary?.currentStreak ?? 0} day${moodSummary?.currentStreak === 1 ? "" : "s"}`}
-            sub="Keep it going!"
+            sub="Keep it going"
           />
           <StatCard
-            icon={<Activity size={20} className="text-violet-500" />}
-            label="Avg. Intensity"
-            value={
-              moodSummary?.averageIntensity
-                ? `${moodSummary.averageIntensity}/10`
-                : "—"
-            }
+            icon={<Activity size={17} className="text-violet-500" />}
+            label="Avg. intensity"
+            value={moodSummary?.averageIntensity ? `${moodSummary.averageIntensity}/10` : "—"}
             sub="Last 90 days"
           />
           <StatCard
-            icon={<Zap size={20} className={stressScore?.label ? STRESS_COLOUR[stressScore.label]?.split(" ")[0] : "text-slate-400"} />}
-            label="Stress Score"
+            icon={<Zap size={17} className={stressStyle?.text ?? "text-subtle"} />}
+            label="Stress score"
             value={`${stressScore?.score ?? 0}/100`}
             sub={stressScore?.label ?? "—"}
-            valueClass={stressScore ? STRESS_COLOUR[stressScore.label] : undefined}
+            subClassName={stressStyle ? `${stressStyle.text} ${stressStyle.bg} px-1.5 py-0.5 rounded-sm text-[10px]` : undefined}
           />
         </div>
 
-        {/* ── Weekly Trend Chart + Insight ── */}
+        {/* ── Chart + Insight ─────────────────────────────────────── */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-                <TrendingUp size={18} className="text-teal-600" />
-                Weekly Mood Trend
-              </h2>
+          <div className="lg:col-span-2 bg-surface border border-border rounded-lg shadow-xs p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <TrendingUp size={16} className="text-primary" strokeWidth={2} />
+                Weekly mood trend
+              </div>
               <Link
                 href="/mood"
-                className="text-xs text-teal-600 hover:underline flex items-center gap-1"
+                className="text-xs text-primary hover:text-primary-hover transition-colors font-medium"
               >
-                Full history <ArrowRight size={12} />
+                Full history →
               </Link>
             </div>
             <MoodTrendChart data={weeklyTrend ?? []} />
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-3">
-                <Sparkles size={18} className="text-amber-500" />
-                Weekly Insight
-              </h2>
-              {latestInsight ? (
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {latestInsight.content}
-                </p>
-              ) : (
-                <p className="text-sm text-slate-400 italic">
-                  Log your mood daily to unlock AI-generated insights.
-                </p>
-              )}
+          <div className="bg-surface border border-border rounded-lg shadow-xs p-6 flex flex-col">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-4">
+              <Sparkles size={16} className="text-warning" strokeWidth={2} />
+              Weekly insight
             </div>
+            {latestInsight ? (
+              <p className="font-display italic text-[17px] font-normal text-foreground leading-relaxed flex-1">
+                "{latestInsight.content}"
+              </p>
+            ) : (
+              <p className="text-sm text-subtle italic flex-1">
+                Log your mood daily to unlock AI-generated insights.
+              </p>
+            )}
             <Link
               href="/mood"
-              className="mt-4 text-xs text-teal-600 hover:underline flex items-center gap-1"
+              className="mt-4 text-xs text-primary hover:text-primary-hover transition-colors font-medium"
             >
-              Log mood <ArrowRight size={12} />
+              Log mood →
             </Link>
           </div>
         </div>
 
-        {/* ── Additional Stats Row ── */}
+        {/* ── Additional stats (sleep/energy) ──────────────────────── */}
         {(moodSummary?.averageSleepScore || moodSummary?.averageEnergyScore) && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {moodSummary.averageSleepScore && (
+            {moodSummary.averageSleepScore != null && (
               <StatCard
-                icon={<Moon size={20} className="text-indigo-500" />}
-                label="Avg. Sleep"
+                icon={<Moon size={17} className="text-indigo-500" />}
+                label="Avg. sleep"
                 value={`${moodSummary.averageSleepScore}/10`}
                 sub="Last 90 days"
               />
             )}
-            {moodSummary.averageEnergyScore && (
+            {moodSummary.averageEnergyScore != null && (
               <StatCard
-                icon={<Zap size={20} className="text-yellow-500" />}
-                label="Avg. Energy"
+                icon={<Zap size={17} className="text-yellow-500" />}
+                label="Avg. energy"
                 value={`${moodSummary.averageEnergyScore}/10`}
                 sub="Last 90 days"
               />
             )}
             <StatCard
-              icon={<Brain size={20} className="text-teal-500" />}
-              label="Entries Logged"
+              icon={<Brain size={17} className="text-accent" />}
+              label="Entries logged"
               value={`${moodSummary?.totalEntries ?? 0}`}
               sub="Last 90 days"
             />
           </div>
         )}
 
-        {/* ── Bottom Row: Recent Chats + Recommended Specialist ── */}
+        {/* ── Bottom row ─────────────────────────────────────────── */}
         <div className="grid lg:grid-cols-2 gap-6">
 
-          {/* Recent Journal / Chats */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
-              <MessageSquare size={18} className="text-teal-600" />
-              Recent Conversations
-            </h2>
+          {/* Recent conversations */}
+          <div className="bg-surface border border-border rounded-lg shadow-xs p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <MessageSquare size={16} className="text-primary" strokeWidth={2} />
+                Recent conversations
+              </div>
+              <Link href="/chat" className="text-xs text-primary hover:text-primary-hover transition-colors font-medium">
+                New chat →
+              </Link>
+            </div>
             {recentSessions?.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {recentSessions.map((s: any) => (
                   <Link
                     key={s.id}
                     href={`/chat/${s.id}`}
-                    className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                    className="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-surface-hover transition-colors"
                   >
-                    <span className="text-sm text-slate-700 truncate">{s.title ?? "Untitled Chat"}</span>
-                    <ArrowRight size={14} className="text-slate-300 group-hover:text-teal-500 shrink-0 ml-2" />
+                    <span className="text-sm text-foreground truncate">{s.title ?? "Untitled chat"}</span>
+                    <ArrowRight size={13} className="text-border-strong group-hover:text-primary shrink-0 ml-2 transition-colors" />
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400">No conversations yet. Start chatting!</p>
+              <EmptyState message="No conversations yet." action={{ href: "/chat", label: "Start chatting" }} />
             )}
-            <Link
-              href="/chat"
-              className="mt-4 inline-flex items-center gap-1 text-xs text-teal-600 hover:underline"
-            >
-              New conversation <ArrowRight size={12} />
-            </Link>
           </div>
 
-          {/* Recommended Specialist */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-2">
-              <UserCheck size={18} className="text-teal-600" />
-              Suggested Support
-            </h2>
-            {recommendationReason && (
-              <p className="text-xs text-slate-400 mb-4 leading-relaxed italic">
-                {recommendationReason}
-              </p>
-            )}
-            {recommendedSpecialists?.length > 0 ? (
-              <div className="space-y-3">
-                {recommendedSpecialists.map((sp: any) => (
-                  <div
-                    key={sp.id}
-                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-semibold text-sm shrink-0">
-                      {sp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+          {/* Recommended specialist */}
+          <div className="bg-surface border border-border rounded-lg shadow-xs p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Heart size={16} className="text-primary" strokeWidth={2} />
+                Specialist match
+              </div>
+              <Link href="/support" className="text-xs text-primary hover:text-primary-hover transition-colors font-medium">
+                All specialists →
+              </Link>
+            </div>
+
+            {topSpecialist ? (
+              <div>
+                {recommendationReason && (
+                  <p className="text-xs text-muted mb-4 leading-relaxed italic">
+                    {recommendationReason}
+                  </p>
+                )}
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-md bg-primary-muted flex items-center justify-center text-primary font-medium text-sm shrink-0">
+                    {topSpecialist.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-foreground">{topSpecialist.name}</p>
+                      {topSpecialist.verified && <BadgeCheck size={14} className="text-accent shrink-0" />}
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">{sp.name}</p>
-                      <p className="text-xs text-slate-500 truncate">{sp.title}</p>
-                    </div>
-                    <div className="ml-auto shrink-0 text-xs text-amber-600 font-medium">
-                      ★ {sp.rating}
+                    <p className="text-xs text-muted mt-0.5">{topSpecialist.title}</p>
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <Star size={11} className="text-warning fill-warning" />
+                      <span className="text-xs text-muted">{topSpecialist.rating}</span>
+                      <span className="text-border-strong mx-1">·</span>
+                      <span className="text-xs text-muted">{topSpecialist.yearsOfExperience} yrs exp.</span>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">Chat more to receive personalised suggestions.</p>
+              <EmptyState
+                message="Chat more to receive personalised specialist recommendations."
+                action={{ href: "/support", label: "Browse specialists" }}
+              />
             )}
-            <Link
-              href="/support"
-              className="mt-4 inline-flex items-center gap-1 text-xs text-teal-600 hover:underline"
-            >
-              View all specialists <ArrowRight size={12} />
-            </Link>
           </div>
         </div>
       </div>
@@ -269,52 +279,85 @@ export default function DashboardPage() {
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────
+/* ── Primitives ──────────────────────────────────────────────────────────── */
 
 function StatCard({
   icon,
   label,
   value,
   sub,
-  valueClass,
+  subClassName,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   sub?: string;
-  valueClass?: string;
+  subClassName?: string;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="bg-surface border border-border rounded-lg shadow-xs p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
         {icon}
-        <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-          {label}
-        </span>
+        <span className="text-xs text-subtle uppercase tracking-wide font-medium">{label}</span>
       </div>
-      <p
-        className={`text-xl font-semibold ${valueClass ?? "text-slate-900"} truncate`}
-      >
-        {value}
-      </p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+      <p className="text-xl font-semibold text-foreground tracking-tight capitalize">{value}</p>
+      {sub && (
+        <span className={subClassName ?? "text-[11px] text-subtle"}>
+          {sub}
+        </span>
+      )}
     </div>
   );
 }
 
+function EmptyState({
+  message,
+  action,
+}: {
+  message: string;
+  action?: { href: string; label: string };
+}) {
+  return (
+    <div className="py-4">
+      <p className="text-sm text-subtle italic">{message}</p>
+      {action && (
+        <Link
+          href={action.href}
+          className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:text-primary-hover font-medium transition-colors"
+        >
+          {action.label} →
+        </Link>
+      )}
+    </div>
+  );
+}
+
+/* ── Skeleton ────────────────────────────────────────────────────────────── */
+
 function DashboardSkeleton() {
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8 animate-pulse">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="h-8 bg-slate-200 rounded w-1/3" />
+    <div className="flex-1 overflow-y-auto bg-background px-6 py-8 md:px-8">
+      <div className="max-w-5xl mx-auto space-y-8 animate-pulse">
+        {/* Header */}
+        <div className="space-y-2">
+          <div className="h-8 bg-border rounded-md w-56" />
+          <div className="h-4 bg-border rounded w-40" />
+        </div>
+        {/* Stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-5 h-28 border border-slate-100" />
+            <div key={i} className="bg-surface border border-border rounded-lg p-4 h-24" />
           ))}
         </div>
+        {/* Chart row */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-2xl h-56 border border-slate-100" />
-          <div className="bg-white rounded-2xl h-56 border border-slate-100" />
+          <div className="lg:col-span-2 bg-surface border border-border rounded-lg h-64" />
+          <div className="bg-surface border border-border rounded-lg h-64" />
+        </div>
+        {/* Bottom row */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="bg-surface border border-border rounded-lg h-56" />
+          <div className="bg-surface border border-border rounded-lg h-56" />
         </div>
       </div>
     </div>

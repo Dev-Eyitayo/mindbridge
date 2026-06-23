@@ -1,0 +1,316 @@
+@import "tailwindcss";
+
+:root {
+  /* ── Backgrounds ── */
+  --background:        #f8f7f5;   /* warm off-white, not cold slate */
+  --background-alt:   #f2f1ef;   /* slightly deeper for nested surfaces */
+  --surface:          #ffffff;   /* cards, panels, dialogs */
+  --surface-hover:    #fafaf9;
+  --surface-raised:   #ffffff;   /* modals, popovers */
+
+  /* ── Foregrounds ── */
+  --foreground:        #1a1917;   /* near-black, warm undertone */
+  --foreground-muted:  #6b6864;   /* secondary text */
+  --foreground-subtle: #a09d99;   /* placeholders, timestamps, captions */
+  --foreground-inverse:#ffffff;
+
+  /* ── Primary — Indigo (calm, trust, depth) ── */
+  --primary:           #4f46e5;   /* indigo-600 */
+  --primary-hover:     #4338ca;   /* indigo-700 */
+  --primary-muted:     #eef2ff;   /* indigo-50 */
+  --primary-subtle:    #c7d2fe;   /* indigo-200 */
+  --primary-fg:        #ffffff;
+
+  /* ── Accent — Teal (secondary warmth) ── */
+  --accent:            #0d9488;   /* teal-600 */
+  --accent-muted:      #f0fdfa;   /* teal-50 */
+  --accent-subtle:     #99f6e4;   /* teal-200 */
+
+  /* ── Semantic ── */
+  --success:           #16a34a;
+  --success-muted:     #f0fdf4;
+  --warning:           #d97706;
+  --warning-muted:     #fffbeb;
+  --destructive:       #dc2626;
+  --destructive-muted: #fef2f2;
+  --destructive-fg:    #ffffff;
+
+  /* ── Borders ── */
+  --border:            #e8e6e3;
+  --border-strong:     #ccc9c5;
+  --border-focus:      #4f46e5;
+
+  /* ── Shadows ── */
+  --shadow-xs:  0 1px 2px 0 rgba(0,0,0,0.04);
+  --shadow-sm:  0 1px 4px 0 rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px 0 rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+  --shadow-lg:  0 8px 24px 0 rgba(0,0,0,0.10), 0 4px 8px -4px rgba(0,0,0,0.06);
+  --shadow-xl:  0 20px 48px 0 rgba(0,0,0,0.12), 0 8px 16px -8px rgba(0,0,0,0.08);
+
+  /* ── Radius ── */
+  --radius-sm:  6px;
+  --radius:     10px;    /* buttons, inputs */
+  --radius-md:  12px;    /* small cards, chips */
+  --radius-lg:  16px;    /* main cards, panels */
+  --radius-xl:  24px;    /* modals, large surfaces */
+  --radius-full:9999px;  /* pills, badges only */
+
+  /* ── Spacing rhythm ── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  /* ── Typography ── */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Motion ── */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --duration-fast:   120ms;
+  --duration-normal: 200ms;
+  --duration-slow:   350ms;
+}
+
+/* ── Dark Mode ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background:        #111110;
+    --background-alt:    #191918;
+    --surface:           #1c1c1a;
+    --surface-hover:     #242422;
+    --surface-raised:    #252523;
+
+    --foreground:        #f5f4f0;
+    --foreground-muted:  #a09d98;
+    --foreground-subtle: #6b6864;
+    --foreground-inverse:#111110;
+
+    --primary:           #818cf8;   /* indigo-400 — lighter for dark bg */
+    --primary-hover:     #a5b4fc;
+    --primary-muted:     #1e1b4b;
+    --primary-subtle:    #312e81;
+    --primary-fg:        #ffffff;
+
+    --accent:            #2dd4bf;
+    --accent-muted:      #042f2e;
+    --accent-subtle:     #134e4a;
+
+    --success:           #4ade80;
+    --success-muted:     #052e16;
+    --warning:           #fbbf24;
+    --warning-muted:     #1c1400;
+    --destructive:       #f87171;
+    --destructive-muted: #2d1515;
+
+    --border:            #2a2926;
+    --border-strong:     #3d3c39;
+    --border-focus:      #818cf8;
+
+    --shadow-xs:  0 1px 2px 0 rgba(0,0,0,0.3);
+    --shadow-sm:  0 1px 4px 0 rgba(0,0,0,0.4);
+    --shadow-md:  0 4px 12px 0 rgba(0,0,0,0.5);
+    --shadow-lg:  0 8px 24px 0 rgba(0,0,0,0.6);
+    --shadow-xl:  0 20px 48px 0 rgba(0,0,0,0.7);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Base Styles
+───────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Focus ── */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--primary-subtle);
+  color: var(--foreground);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Scrollbars — thin and tasteful
+───────────────────────────────────────────────────────────── */
+
+.sidebar-scroll,
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar,
+.chat-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track,
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb,
+.chat-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover,
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--foreground-subtle);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Animations
+───────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40%           { transform: scale(1);   opacity: 1;   }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-smooth) both;
+}
+
+.animate-slide-in {
+  animation: slideInFromLeft var(--duration-normal) var(--ease-smooth) both;
+}
+
+/* Stagger children */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; }
+
+/* ─────────────────────────────────────────────────────────────
+   Typing indicator dots
+───────────────────────────────────────────────────────────── */
+
+.typing-dot {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0ms; }
+.typing-dot:nth-child(2) { animation-delay: 160ms; }
+.typing-dot:nth-child(3) { animation-delay: 320ms; }
+
+/* ─────────────────────────────────────────────────────────────
+   Composer glow — the signature design element
+   A subtle inset glow on focus that signals "this is where
+   your thoughts go" without screaming for attention.
+───────────────────────────────────────────────────────────── */
+
+.composer-input:focus {
+  box-shadow:
+    0 0 0 1px var(--border-focus),
+    0 0 0 4px rgba(79, 70, 229, 0.08),
+    var(--shadow-sm);
+  outline: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Prose (ReactMarkdown output inside chat)
+───────────────────────────────────────────────────────────── */
+
+.chat-prose p {
+  margin: 0 0 0.75em;
+  line-height: 1.65;
+}
+
+.chat-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-prose ul, .chat-prose ol {
+  margin: 0.5em 0;
+  padding-left: 1.25em;
+}
+
+.chat-prose li {
+  margin-bottom: 0.25em;
+  line-height: 1.55;
+}
+
+.chat-prose strong {
+  font-weight: 600;
+}
+
+.chat-prose em {
+  font-style: italic;
+}
+
+.chat-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--background-alt);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Range input — accent colour via CSS variable
+───────────────────────────────────────────────────────────── */
+
+input[type="range"] {
+  accent-color: var(--primary);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reduced motion
+───────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
