@@ -7,9 +7,7 @@ export default withAuth(
     const isAuth   = !!token;
     const pathname = req.nextUrl.pathname;
 
-    const isPublicPage = pathname === "/" || pathname === "/login";
-
-    if (isAuth && isPublicPage) {
+    if (isAuth && pathname === "/login") {
       return NextResponse.redirect(new URL("/chat", req.url));
     }
 
@@ -19,9 +17,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname;
-        // Public pages are always accessible
         if (pathname === "/" || pathname === "/login") return true;
-        // Everything else requires auth
         return !!token;
       },
     },
