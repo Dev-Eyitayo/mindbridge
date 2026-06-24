@@ -7,10 +7,9 @@ import {
 import { useEffect, useState } from "react";
 
 interface TrendPoint {
-  day: string;
-  avgIntensity: number;
-  avgSleep?: number | null;
-  avgEnergy?: number | null;
+  date: string;
+  label: string;       
+  average: number | null;
   count: number;
 }
 
@@ -102,7 +101,10 @@ export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
     });
   }, []);
 
-  if (!data || data.length === 0) {
+  // Filter out days with no data for the empty-state check
+  const hasAnyData = data?.some((d) => d.average !== null && d.count > 0);
+
+  if (!data || data.length === 0 || !hasAnyData) {
     return (
       <div style={{ height: 190, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <p className="text-sm italic" style={{ color: "var(--text-tertiary)" }}>
@@ -112,14 +114,9 @@ export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
     );
   }
 
-  // Don't render the chart at all until the client has mounted and the
-  // parent container has a real pixel size — prevents the width/height=-1 error.
   if (!mounted) {
     return <div style={{ height: 190 }} />;
   }
-
-  const hasSleep  = data.some((d) => d.avgSleep  != null);
-  const hasEnergy = data.some((d) => d.avgEnergy != null);
 
   return (
     <div
@@ -127,15 +124,16 @@ export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
         position: "relative",
         width: "100%",
         height: 190,
-        minWidth: 0,       // lets flex/grid children shrink below content size
-        minHeight: 190,    // guarantees recharts gets a positive height
+        minWidth: 0,
+        minHeight: 190,
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
+        {/* dataKey="label" for XAxis — matches { label: "Mon" } from mood.service */}
         <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={c.border} vertical={false} />
           <XAxis
-            dataKey="day"
+            dataKey="label"
             tick={{ fill: c.subtle, fontSize: 11 }}
             tickLine={false}
             axisLine={false}
@@ -156,9 +154,10 @@ export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
               />
             )}
           />
+          {/* dataKey="average" — matches { average: number | null } from mood.service */}
           <Line
             type="monotone"
-            dataKey="avgIntensity"
+            dataKey="average"
             stroke={c.violet}
             strokeWidth={2}
             dot={{ fill: c.card, stroke: c.violet, strokeWidth: 2, r: 3 }}
@@ -166,30 +165,6 @@ export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
             name="Mood"
             connectNulls
           />
-          {hasSleep && (
-            <Line
-              type="monotone"
-              dataKey="avgSleep"
-              stroke={c.cyan}
-              strokeWidth={1.5}
-              dot={false}
-              strokeDasharray="4 3"
-              name="Sleep"
-              connectNulls
-            />
-          )}
-          {hasEnergy && (
-            <Line
-              type="monotone"
-              dataKey="avgEnergy"
-              stroke={c.amber}
-              strokeWidth={1.5}
-              dot={false}
-              strokeDasharray="2 3"
-              name="Energy"
-              connectNulls
-            />
-          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getMoodSummary, getWeeklyMoodTrend, getRecentMoodEntries } from "@/lib/services/mood.service";
 import { getStressScore, getDominantEmotions } from "@/lib/services/analytics.service";
-import { getLatestInsight } from "@/lib/services/insight.service";
+import { generateWeeklyInsights, getLatestInsight } from "@/lib/services/insight.service";
 import { getSpecialistRecommendations } from "@/lib/services/specialist-recommendation.service";
 import prisma from "@/lib/prisma";
 
@@ -38,6 +38,12 @@ export async function GET() {
       select: { id: true, title: true, updatedAt: true },
     }),
   ]);
+
+
+  // Auto-generate if no insight exists for this week yet
+  if (!latestInsight) {
+    generateWeeklyInsights(userId).catch(() => {});
+  }
 
   // Get specialist recommendations based on patterns
   const { specialists, reason } = await getSpecialistRecommendations(

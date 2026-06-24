@@ -215,59 +215,6 @@ npx prisma db seed
 
 ```
 
-## codebase.md
-
-```markdown
-# mindbridge
-
-## README.md
-
-```markdown
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-```
-
-## codebase.md
-
-```markdown
-
-```
-
 ## next.config.ts
 
 ```typescript
@@ -281,1799 +228,7 @@ export default nextConfig;
 
 ```
 
-## package.json
 
-```json
-{
-  "name": "mindbridge",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
-  },
-  "dependencies": {
-    "@ai-sdk/deepseek": "^2.0.38",
-    "@ai-sdk/google": "^3.0.82",
-    "@ai-sdk/openai": "^3.0.71",
-    "@libsql/client": "^0.17.3",
-    "@prisma/adapter-libsql": "^7.8.0",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "ai": "^6.0.205",
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.4.2",
-    "lucide-react": "^1.18.0",
-    "next": "16.2.9",
-    "next-auth": "^4.24.14",
-    "openai": "^6.42.0",
-    "prisma": "^7.8.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-markdown": "^10.1.0",
-    "sonner": "^2.0.7",
-    "swr": "^2.4.1",
-    "zustand": "^5.0.14"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@tailwindcss/typography": "^0.5.20",
-    "@types/bcrypt": "^6.0.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
-}
-
-```
-
-
-## prisma.config.ts
-
-```typescript
-import "dotenv/config"; 
-import { defineConfig, env } from "prisma/config";
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-  },
-
-  datasource: {
-    url: env("DATABASE_URL"),
-  },
-});
-```
-
-## prisma/migrations/20260617215753_setup_chats/migration.sql
-
-```sql
--- CreateTable
-CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
-    "matric" TEXT,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'student',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ChatSession" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "title" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "ChatSession_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Message" (
-    "id" TEXT NOT NULL,
-    "sessionId" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "MoodEntry" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "value" INTEGER NOT NULL,
-    "note" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "MoodEntry_pkey" PRIMARY KEY ("id")
-);
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- AddForeignKey
-ALTER TABLE "ChatSession" ADD CONSTRAINT "ChatSession_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Message" ADD CONSTRAINT "Message_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "ChatSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "MoodEntry" ADD CONSTRAINT "MoodEntry_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-```
-
-## prisma/migrations/migration_lock.toml
-
-```toml
-# Please do not edit this file manually
-# It should be added in your version-control system (e.g., Git)
-provider = "postgresql"
-
-```
-
-## src/app/api/auth/[...nextauth]/route.ts
-
-```typescript
-import NextAuth, { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
-
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
-        }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-
-        if (!user) {
-          throw new Error("User not found");
-        }
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-
-        if (!isPasswordValid) {
-          throw new Error("Invalid password");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
-          role: user.role,
-        };
-      }
-    })
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role;
-        token.id = user.id;
-      }
-      return token;
-    },
-
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role as string;
-        session.user.id = token.id as string;
-      }
-      return session;
-    }
-  },
-  pages: {
-    signIn: '/login',
-  }
-};
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
-```
-
-## src/app/api/auth/register/route.ts
-
-```typescript
-import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
-import prisma from "../../../../lib/prisma";
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const { firstName, lastName, email, password } = body;
-
-    // 1. Make sure all fields are filled out
-    if (!firstName || !lastName || !email || !password) {
-      return NextResponse.json(
-        { error: "Please fill in all fields." }, 
-        { status: 400 }
-      );
-    }
-
-    // 2. Check if the user already exists in SQLite
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "This email is already registered." }, 
-        { status: 400 }
-      );
-    }
-
-    // 3. Hash the password securely
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 4. Save the new user to the database
-    const user = await prisma.user.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,
-      }
-    });
-
-    // 5. Send success back to the frontend so NextAuth can log them in
-    return NextResponse.json({ success: true }, { status: 201 });
-
-  } catch (error: any) {
-    console.error("SERVER ERROR:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" }, 
-      { status: 500 }
-    );
-  }
-}
-```
-
-## src/app/api/chat/history/route.ts
-
-```typescript
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-
-export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const { searchParams } = new URL(req.url);
-  const sessionId = searchParams.get('sessionId');
-  if (!sessionId) return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
-
-  // Verify ownership before fetching messages
-  const chatSession = await prisma.chatSession.findFirst({
-    where: { 
-      id: sessionId,
-      userId: session.user.id // This acts as your security guard
-    }
-  });
-
-  if (!chatSession) {
-    return NextResponse.json({ error: 'Not found or unauthorized' }, { status: 404 });
-  }
-
-  const messages = await prisma.message.findMany({
-    where: { sessionId },
-    orderBy: { createdAt: 'asc' },
-  });
-
-  return NextResponse.json(messages);
-}
-```
-
-## src/app/api/chat/route.ts
-
-```typescript
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import OpenAI from 'openai';
-
-const groq = new OpenAI({
-  baseURL: 'https://api.groq.com/openai/v1',
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-};
-
-const systemPrompt = `
-You are a compassionate mental wellness companion.
-
-Your role is to provide emotional support, reflection, and practical coping guidance.
-
-Guidelines:
-- Be warm, empathetic, and non-judgmental.
-- Listen carefully before offering advice.
-- Help users explore their thoughts and emotions.
-- Ask gentle follow-up questions when appropriate.
-- Validate feelings without making assumptions.
-- Avoid toxic positivity.
-- Avoid lecturing.
-- Avoid sounding like a therapist conducting an assessment.
-
-When responding:
-- First acknowledge the user's experience.
-- Then offer perspective, reflection, or support.
-- Finally suggest practical next steps only if appropriate.
-
-Do not:
-- Diagnose mental health conditions.
-- Claim to be a therapist.
-- Prescribe medication.
-- Guarantee outcomes.
-- Encourage dependency on the AI.
-
-If a user expresses severe distress, self-harm thoughts, suicidal ideation, or intent to harm others:
-- Prioritize safety.
-- Encourage reaching out to trusted people and professional support.
-- Remain calm and supportive.
-- Do not be dismissive.
-
-Communication style:
-- Natural and conversational.
-- Human sounding, not corporate.
-- Short paragraphs.
-- Avoid excessive bullet points unless helpful.
-- Match the user's tone and emotional intensity.
-
-Your goal is not to solve every problem.
-Your goal is to help the user feel heard, understood, and supported while encouraging healthy reflection and action.
-`;
-
-const titlePrompt = `
-You generate chat session titles.
-
-Rules:
-- Output ONLY the title.
-- 3 to 6 words maximum.
-- Must be a short noun phrase, not a sentence.
-- No punctuation (no periods, commas, colons).
-- No quotes.
-- No "Chat about", "Discussion on", or similar prefixes.
-- No repetition of words from the input unless essential.
-- Make it sound like a clean app conversation title.
-
-Style guidelines:
-- Prefer natural human labeling like:
-  "Work Stress Reflection", "Overthinking Late Night", "Relationship Confusion"
-- Avoid generic titles like "New Chat", "Conversation", "User Message"
-- Avoid full sentences like "I feel overwhelmed today"
-
-Return only the title text.
-`;
-
-export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
-  let { messages, sessionId }: { messages: Message[]; sessionId?: string } =
-    await req.json();
-
-  let isNewSession = !sessionId || sessionId === "new";
-
-  // Create new session if needed
-  if (isNewSession) {
-    const newSession = await prisma.chatSession.create({
-      data: {
-        userId,
-        title: "New Chat",
-      },
-    });
-    sessionId = newSession.id;
-  }
-
-  if (!sessionId) {
-    return new NextResponse("Session ID is required", { status: 400 });
-  }
-
-  const userMessage = messages[messages.length - 1];
-
-  // Save user message
-  await prisma.message.create({
-    data: {
-      sessionId,
-      role: "user",
-      content: userMessage.content,
-      userId,
-    },
-  });
-
-  const aiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: "system", content: systemPrompt },
-    ...messages.map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
-    })),
-  ];
-
-  const response = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: aiMessages,
-    stream: true,
-  });
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      let fullResponse = "";
-
-      try {
-        for await (const chunk of response) {
-          const text = chunk.choices[0]?.delta?.content || "";
-          fullResponse += text;
-          controller.enqueue(new TextEncoder().encode(text));
-        }
-      } catch (error) {
-        console.error("Streaming error:", error);
-      } finally {
-        controller.close();
-      }
-
-      // Save assistant response
-      await prisma.message.create({
-        data: {
-          sessionId,
-          role: "assistant",
-          content: fullResponse,
-          userId,
-        },
-      });
-
-      // Background Title Generation (only for new chats)
-      if (isNewSession) {
-        try {
-          const titleCompletion = await groq.chat.completions.create({
-            model: "llama-3.1-8b-instant",
-            messages: [
-              {
-                role: "system",
-                content: titlePrompt,
-              },
-              {
-                role: "user",
-                content: userMessage.content,
-              },
-            ],
-            temperature: 0.7,
-            max_tokens: 20,
-          });
-
-          let newTitle =
-            titleCompletion.choices[0]?.message?.content?.trim() ||
-            "New Chat";
-
-          // Clean title
-          newTitle = newTitle
-            .replace(/^["']|["']$/g, "")
-            .trim();
-
-          await prisma.chatSession.update({
-            where: { id: sessionId },
-            data: { title: newTitle },
-          });
-        } catch (error) {
-          console.error("Failed to auto-generate title:", error);
-        }
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "X-Session-Id": sessionId,
-      "Content-Type": "text/event-stream",
-    },
-  });
-}
-```
-
-## src/app/api/chat/sessions/route.ts
-
-```typescript
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-
-export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const chats = await prisma.chatSession.findMany({
-    where: { userId: session.user.id },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return NextResponse.json(chats);
-}
-```
-
-## src/app/app/[[...sessionId]]/page.tsx
-
-```typescript
-"use client";
-
-import { useSession } from "next-auth/react";
-import { Sparkles, HeartPulse, Brain, ArrowUp } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import { useChatLogic } from "@/hooks/use-chat-logic";
-import { TypingIndicator } from "@/components/TypingIndicator";
-import { useEffect, useRef, use } from "react";
-
-export default function DashboardPage({ params }: { params: Promise<{ sessionId?: string[] }> }) {
-  const { data: session } = useSession();
-  const unwrappedParams = use(params);
-  const sessionId = unwrappedParams?.sessionId?.[0];
-
-  const { messages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading } = useChatLogic(sessionId);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const firstName = session?.user?.name?.split(" ")[0] || "there";
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
-  const suggestions = [
-    { icon: Brain, text: "I'm feeling really overwhelmed with work today." },
-    { icon: HeartPulse, text: "I've been experiencing a lot of anxiety lately." },
-    { icon: Sparkles, text: "I just want to reflect on my day." },
-  ];
-
-  const handleSuggestionClick = async (text: string) => {
-    handleInputChange({ target: { value: text } } as any);
-    setTimeout(async () => {
-      const fakeEvent = { preventDefault: () => {} } as any;
-      await handleSubmit(fakeEvent);
-    }, 0);
-  };
-
-  // Auto-scroll to bottom smoothly
-  useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: 'smooth'
-    });
-  }, [messages]);
-
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleInputChange(e);
-    const textarea = e.target;
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`;
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (input.trim() && !isLoading) {
-        const fakeEvent = { preventDefault: () => {} } as any;
-        handleSubmit(fakeEvent);
-      }
-    }
-  };
-
-  // ---- Render decision, in priority order ----
-  //
-  // 1. We have messages -> always render the chat thread. This is checked
-  //    FIRST and is the load-bearing fix: messages now come from the
-  //    Zustand store (see useChatLogic), which is re-keyed (not cleared)
-  //    when "new" becomes a real sessionId. So at the exact moment
-  //    router.replace fires, `messages` is already the same non-empty
-  //    array it was a millisecond earlier. There is no render frame in
-  //    which sessionId is the new uuid AND messages is empty, because
-  //    those two facts are now updated in the same synchronous store
-  //    write (promoteDraftToSession), not across a fetch boundary.
-  //
-  // 2. Only if there are truly zero messages AND we're fetching a cold
-  //    session's history do we show the skeleton. This path is only ever
-  //    hit for a direct link / refresh into an existing session, never
-  //    for the new -> uuid transition.
-  //
-  // 3. Otherwise, zero messages and not loading -> the welcome screen.
-  const showSkeleton = isHistoryLoading && messages.length === 0;
-  const showWelcome = !showSkeleton && messages.length === 0;
-
-  return (
-    <div className="flex-1 flex flex-col h-screen bg-slate-50">
-      <div className="flex-1 overflow-y-auto p-6 md:p-8" ref={scrollRef}>
-        <div className="max-w-3xl mx-auto">
-          {showSkeleton ? (
-            <ChatSkeleton />
-          ) : showWelcome ? (
-            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
-                <Sparkles className="text-teal-600" size={36} />
-              </div>
-              <h1 className="font-serif text-4xl font-semibold text-slate-900 mb-3">
-                {getGreeting()}, {firstName}.
-              </h1>
-              <p className="text-slate-600 text-lg mb-12 max-w-md">
-                This is a safe space. How are you feeling today?
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
-                {suggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSuggestionClick(s.text)}
-                    className="flex flex-col items-start p-5 bg-white border border-slate-200 hover:border-teal-200 rounded-xl text-left transition-colors hover:bg-slate-50"
-                  >
-                    <s.icon size={22} className="text-slate-600 mb-3" />
-                    <span className="text-sm text-slate-700 leading-snug">"{s.text}"</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-9 pb-24">
-              {messages.map((m) => (
-                <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-6 py-4 text-[15.5px] leading-relaxed rounded-2xl ${
-                    m.role === 'user'
-                      ? 'bg-teal-600 text-white rounded-br-md'
-                      : 'bg-white border border-slate-200 text-slate-800 rounded-bl-md'
-                  }`}>
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                  </div>
-                </div>
-              ))}
-              {isLoading && <TypingIndicator />}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="border-t border-slate-200 bg-slate-50 p-6">
-        <div className="max-w-3xl mx-auto">
-          <form onSubmit={handleSubmit} className="relative">
-            <textarea
-              value={input}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              rows={1}
-              className="w-full resize-none bg-white border border-slate-200 focus:border-slate-300 focus:outline-none rounded-2xl py-4 pl-6 pr-16 text-slate-900 placeholder:text-slate-400 text-[15.5px] leading-relaxed max-h-[180px] overflow-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className="absolute right-3 bottom-3 p-3 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white rounded-xl transition-colors"
-            >
-              <ArrowUp size={20} strokeWidth={2.5} />
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const ChatSkeleton = () => (
-  <div className="space-y-10 pt-8 max-w-3xl mx-auto">
-    <div className="flex justify-start animate-pulse">
-      <div className="w-full max-w-[88%] sm:max-w-[82%]">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-slate-100 rounded-full" />
-          <div className="h-3.5 w-24 bg-slate-100 rounded" />
-        </div>
-        <div className="bg-white border border-slate-100 rounded-2xl rounded-bl-md px-6 py-6">
-          <div className="space-y-3">
-            <div className="h-4 bg-slate-100 rounded w-11/12" />
-            <div className="h-4 bg-slate-100 rounded w-full" />
-            <div className="h-4 bg-slate-100 rounded w-4/5" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div className="flex justify-end animate-pulse">
-      <div className="w-full max-w-[85%] sm:max-w-[78%]">
-        <div className="bg-teal-100 rounded-2xl rounded-br-md px-6 py-6">
-          <div className="space-y-3">
-            <div className="h-4 bg-teal-50 rounded w-4/5" />
-            <div className="h-4 bg-teal-50 rounded w-full" />
-            <div className="h-4 bg-teal-50 rounded w-3/4" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-```
-
-## src/app/app/layout.tsx
-
-```typescript
-"use client";
-
-import { useRouter, useParams } from 'next/navigation';
-import { signOut } from "next-auth/react";
-import Link from "next/link";
-import {
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  Menu,
-  X,
-  History
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import useSWR from 'swr';
-import { useChatStore, selectSidebarRefresh } from '@/store/useChatStore';
-
-const fetcher = (url: string) => fetch(url, { credentials: 'include' }).then(res => res.json());
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const router = useRouter();
-
-  const params = useParams();
-  const currentSessionId = Array.isArray(params?.sessionId) ? params.sessionId[0] : undefined;
-
-  const triggerRefresh = useChatStore(selectSidebarRefresh);
-  const resetRefresh = useChatStore((state) => state.resetRefresh);
-  const resetActiveChat = useChatStore((state) => state.resetActiveChat);
-
-  const { data, mutate } = useSWR('/api/chat/sessions', fetcher, {
-    refreshInterval: 4000,
-    revalidateOnFocus: true
-  });
-
-  const sessions = Array.isArray(data) ? data : [];
-
-  // Listen for sidebar refresh (new chat titles)
-  useEffect(() => {
-    if (triggerRefresh) {
-      mutate();
-      resetRefresh();
-    }
-  }, [triggerRefresh, mutate, resetRefresh]);
-
-  const handleCreateNewChat = () => {
-    resetActiveChat();
-    router.push('/app');
-    setIsMobileDrawerOpen(false);
-  };
-
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 border-r border-slate-800">
-      {/* Logo */}
-      <div className="px-6 py-8 font-serif text-2xl font-semibold tracking-tighter border-b border-slate-800">
-        🌿 MindBridge
-      </div>
-
-      {/* New Chat Button */}
-      <div className="p-6">
-        <button
-          onClick={handleCreateNewChat}
-          className="w-full flex items-center justify-center gap-3 bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg transition-colors font-medium"
-        >
-          <Plus size={20} /> New Chat
-        </button>
-      </div>
-
-      <nav
-        className="flex-1 px-2 overflow-y-auto pb-6 sidebar-scroll"
-        style={{ scrollbarColor: '#334155 transparent', scrollbarWidth: 'thin' }}
-      >
-        <Link
-          href="/app"
-          onClick={resetActiveChat}
-          className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-slate-900 rounded-lg transition-colors mb-8"
-        >
-          <LayoutDashboard size={18} /> Overview
-        </Link>
-
-        {/* === TODAY SECTION === */}
-        <div className="px-1 mb-8">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-            <History size={14} /> Today
-          </div>
-          <div className="space-y-0.5 pr-2">
-            {sessions
-              .filter((s: any) => isToday(s.createdAt) || s.title === "New Chat")
-              .map((s: any) => {
-                const isActive = s.id === currentSessionId;
-                return (
-                  <Link
-                    key={s.id}
-                    href={`/app/${s.id}`}
-                    className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
-                      isActive
-                        ? 'bg-teal-600/15 text-teal-300 font-medium'
-                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-900'
-                    }`}
-                  >
-                    {s.title || "New Chat"}
-                  </Link>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* === RECENT SECTION === */}
-        <div className="px-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-            <History size={14} /> Recent
-          </div>
-          <div className="space-y-0.5 pr-2">
-            {sessions
-              .filter((s: any) => !isToday(s.createdAt) && s.title !== "New Chat")
-              .map((s: any) => {
-                const isActive = s.id === currentSessionId;
-                return (
-                  <Link
-                    key={s.id}
-                    href={`/app/${s.id}`}
-                    className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
-                      isActive
-                        ? 'bg-teal-600/15 text-teal-300 font-medium'
-                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-900'
-                    }`}
-                  >
-                    {s.title || "Untitled Chat"}
-                  </Link>
-                );
-              })}
-          </div>
-        </div>
-      </nav>
-
-      {/* Sign Out */}
-      <div className="p-6 border-t border-slate-800 mt-auto">
-        <button
-          onClick={() => signOut()}
-          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-400 hover:bg-slate-900 hover:text-red-400 rounded-lg transition-colors"
-        >
-          <LogOut size={18} /> Sign out
-        </button>
-      </div>
-    </div>
-  );
-
-  return (
-
-    <div className="h-screen flex bg-slate-50 overflow-hidden">
-      {/* Mobile Menu Trigger */}
-      <button
-        onClick={() => setIsMobileDrawerOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white border border-slate-200 rounded-lg"
-      >
-        <Menu size={22} />
-      </button>
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-72 shrink-0 h-screen overflow-hidden">
-        <SidebarContent />
-      </aside>
-
-      {/* Mobile Drawer */}
-      {isMobileDrawerOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-72 h-full bg-slate-950 relative">
-            <button
-              onClick={() => setIsMobileDrawerOpen(false)}
-              className="absolute right-4 top-6 p-2 text-slate-400 hover:text-slate-200"
-            >
-              <X size={24} />
-            </button>
-            <SidebarContent />
-          </div>
-          <div
-            className="flex-1 bg-black/60"
-            onClick={() => setIsMobileDrawerOpen(false)}
-          />
-        </div>
-      )}
-
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {children}
-      </main>
-    </div>
-  );
-}
-
-/* Helper Functions */
-const isToday = (date?: string): boolean => {
-  if (!date) return false;
-  const d = new Date(date);
-  const now = new Date();
-  return (
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear()
-  );
-};
-```
-
-## src/app/globals.css
-
-```css
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-
-
-.sidebar-scroll::-webkit-scrollbar {
-  width: 6px;
-}
- 
-.sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
- 
-.sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: #334155; /* slate-700, matches the inline scrollbarColor */
-  border-radius: 9999px;
-}
- 
-.sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #475569; /* slate-600 */
-}
-```
-
-## src/app/layout.tsx
-
-```typescript
-import type { Metadata } from "next";
-import { Nunito, Playfair_Display } from "next/font/google";
-import { Toaster } from "sonner";
-import "./globals.css";
-import { AuthProvider } from "../components/Providers";
-
-const nunito = Nunito({ 
-  subsets: ["latin"],
-  variable: '--font-nunito' 
-});
-
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  style: ['normal', 'italic'],
-  variable: '--font-playfair' 
-});
-
-export const metadata: Metadata = {
-  title: 'MindBridge | AI Mental Wellness',
-  description: 'Your safe space for reflection and AI-powered mental support.',
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
-  openGraph: {
-    type: 'website',
-    url: 'https://mindbridge.app',
-    title: 'MindBridge',
-    description: 'AI-driven mental health support and daily reflection.',
-    siteName: 'MindBridge',
-    images: [{
-      url: '/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'MindBridge App Preview',
-    }],
-  },
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className={`${nunito.variable} ${playfair.variable} font-sans bg-slate-50 text-slate-900`}>
-        <AuthProvider>
-          {/* THE TOASTER MUST BE HERE */}
-          <Toaster richColors position="top-center" theme="light" className="font-sans" />
-          {children}
-        </AuthProvider>
-      </body>
-    </html>
-  );
-}
-```
-
-## src/app/login/page.tsx
-
-```typescript
-"use client";
-
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-
-export default function AuthPage() {
-  const router = useRouter();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [loading, setLoading] = useState(false);
-
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (mode === "signup") {
-        const res = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong during registration.");
-        }
-        
-        toast.success("Account created successfully!");
-      }
-
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      });
-
-      if (result?.error) {
-        throw new Error("Invalid email or password");
-      }
-
-      toast.success("Welcome back!");
-      router.push("/app");
-      router.refresh();
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex bg-slate-50">
-      <div className="hidden lg:flex w-[420px] bg-gradient-to-br from-slate-900 to-slate-800 flex-col p-12 relative overflow-hidden">
-        <div className="absolute w-[300px] h-[300px] bg-teal-500 rounded-full blur-[80px] opacity-20 -bottom-12 -right-20" />
-        <div className="absolute w-[200px] h-[200px] bg-emerald-500 rounded-full blur-[80px] opacity-20 top-24 -left-16" />
-
-        <div className="relative z-10 flex-1 flex flex-col">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center text-xl shadow-md">🌿</div>
-            <div className="font-serif text-2xl font-bold text-white">MindBridge<span className="text-teal-400">.</span></div>
-          </div>
-
-          <div className="mt-auto font-serif text-[22px] italic text-slate-300 leading-relaxed">
-            "You don't have to control your thoughts. You just have to stop letting them control you."
-            <div className="text-slate-500 text-sm mt-4 font-sans not-italic">— Dan Millman</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white rounded-3xl p-10 shadow-sm border-1 border-slate-100">
-          <h1 className="font-serif text-3xl font-bold text-slate-900 mb-2 tracking-tight">
-            {mode === "login" ? "Welcome back" : "Create account"}
-          </h1>
-          <p className="text-slate-500 text-sm mb-8 font-sans">
-            {mode === "login"
-              ? "Sign in to your MindBridge account"
-              : "Join our wellness community today"}
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">First Name</label>
-                  <input required name="firstName" value={form.firstName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Amara" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Last Name</label>
-                  <input required name="lastName" value={form.lastName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Obi" />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Email Address</label>
-              <input required type="email" name="email" value={form.email} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="you@example.com" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Password</label>
-              <input required type="password" name="password" value={form.password} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="••••••••" />
-            </div>
-
-            <button disabled={loading} type="submit" className="font-sans w-full p-4 mt-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-white font-bold transition-all shadow-sm disabled:opacity-70">
-              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
-            </button>
-          </form>
-
-          <div className="text-center mt-8 text-slate-500 text-sm font-sans">
-            {mode === "login" ? (
-              <>New here? <button onClick={() => setMode("signup")} className="text-teal-600 font-bold hover:underline">Create account</button></>
-            ) : (
-              <>Have an account? <button onClick={() => setMode("login")} className="text-teal-600 font-bold hover:underline">Sign in</button></>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
-## src/app/page.tsx
-
-```typescript
-"use client";
-
-import { useState } from 'react';
-import Link from 'next/link';
-import { Brain, HeartPulse, ShieldCheck, ArrowRight, Menu, X } from 'lucide-react';
-
-export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="w-full px-6 py-8 flex items-center justify-between z-50">
-        <div className="flex items-center gap-2 font-serif text-2xl font-bold">
-          <span className="text-teal-600 text-xl">🌿</span> MindBridge
-        </div>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/login" className="text-sm font-semibold hover:text-teal-600 transition-colors">Sign In</Link>
-          <Link href="/login" className="px-6 py-2.5 bg-slate-900 text-white text-sm rounded-full font-semibold hover:bg-slate-800 transition-all">
-            Get Started
-          </Link>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 z-50 relative" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
-
-      {/* Mobile Drawer Overlay */}
-      <div className={`fixed inset-0 bg-white z-40 flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-        <Link href="/login" className="text-2xl font-medium" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-        <Link href="/login" className="px-8 py-4 bg-teal-600 text-white rounded-full text-lg font-medium" onClick={() => setIsMenuOpen(false)}>
-          Get Started
-        </Link>
-      </div>
-
-      {/* Hero Section */}
-      <main className="w-full px-6 pt-16 md:pt-24 pb-20 text-center">
-        <div className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest uppercase text-teal-700 bg-teal-50 rounded-full">
-          Reflect. Grow. Heal.
-        </div>
-        <h1 className="text-5xl md:text-7xl font-serif font-bold text-slate-900 mb-6 tracking-tight">
-          Your thoughts, <br className="hidden md:block"/> understood.
-        </h1>
-        <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-lg mx-auto leading-relaxed px-2">
-          MindBridge provides a safe, non-judgmental space to reflect on your day 
-          and gain clarity through empathetic AI conversation.
-        </p>
-        <Link 
-          href="/login"
-          className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full text-base font-semibold hover:bg-teal-700 transition-all"
-        >
-          Get Started <ArrowRight size={18} />
-        </Link>
-      </main>
-
-      {/* Features Grid */}
-      <section className="w-full px-6 py-20 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
-          <FeatureCard icon={<Brain size={24} className="text-teal-600" />} title="Empathetic AI" desc="Conversations designed to listen, reflect, and guide you through complex emotions." />
-          <FeatureCard icon={<HeartPulse size={24} className="text-teal-600" />} title="Mood Tracking" desc="Visualize your emotional trends over time with daily check-ins." />
-          <FeatureCard icon={<ShieldCheck size={24} className="text-teal-600" />} title="Private & Secure" desc="Your reflections belong to you. Your data is encrypted and strictly private." />
-        </div>
-      </section>
-      
-      {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-6 py-12 border-t border-slate-100 text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div>© 2026 MindBridge. All rights reserved.</div>
-        <div className="flex gap-8">
-          <Link href="/privacy" className="hover:text-teal-600">Privacy</Link>
-          <Link href="/terms" className="hover:text-teal-600">Terms</Link>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
-  return (
-    <div className="space-y-4 px-2">
-      <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-6">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold">{title}</h3>
-      <p className="text-slate-600 leading-relaxed text-base">{desc}</p>
-    </div>
-  );
-}
-```
-
-## src/components/Providers.tsx
-
-```typescript
-"use client";
-
-import { SessionProvider } from "next-auth/react";
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  return <SessionProvider>{children}</SessionProvider>;
-};
-```
-
-## src/components/TypingIndicator.tsx
-
-```typescript
-export const TypingIndicator = () => (
-  <div className="flex gap-1 p-4 bg-slate-100 rounded-2xl w-fit">
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-  </div>
-);
-```
-
-## src/hooks/use-chat-logic.ts
-
-```typescript
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  useChatStore,
-  selectActiveMessages,
-  type ChatMessage,
-} from '@/store/useChatStore';
-
-export function useChatLogic(sessionId?: string) {
-  const router = useRouter();
-
-  const messages = useChatStore(selectActiveMessages);
-  const setMessages = useChatStore((s) => s.setMessages);
-  const startDraftSession = useChatStore((s) => s.startDraftSession);
-  const promoteDraftToSession = useChatStore((s) => s.promoteDraftToSession);
-  const loadHistoryForSession = useChatStore((s) => s.loadHistoryForSession);
-  const isHydrated = useChatStore((s) => s.isHydrated);
-  const triggerSidebarRefresh = useChatStore((s) => s.triggerRefresh);
-
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
-
-  const draftKeyRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    const isNewChat = !sessionId || sessionId === 'new';
-
-    if (isNewChat) {
-      if (!draftKeyRef.current) {
-        setMessages([]);
-      }
-      setIsHistoryLoading(false);
-      return;
-    }
-    if (isHydrated(sessionId)) {
-      setIsHistoryLoading(false);
-      draftKeyRef.current = null; // promotion complete, clear the draft marker
-      return;
-    }
-
-    let cancelled = false;
-    const fetchHistory = async () => {
-      setIsHistoryLoading(true);
-      try {
-        const res = await fetch(`/api/chat/history?sessionId=${sessionId}`, {
-          credentials: 'include',
-        });
-        if (res.ok && !cancelled) {
-          const data: ChatMessage[] = await res.json();
-          loadHistoryForSession(sessionId, data);
-        }
-      } catch (err) {
-        console.error('Failed to load history:', err);
-      } finally {
-        if (!cancelled) setIsHistoryLoading(false);
-      }
-    };
-
-    fetchHistory();
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId, isHydrated, loadHistoryForSession, setMessages]);
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      const currentInput = input.trim();
-      if (!currentInput) return;
-
-      const isNewChat = !sessionId || sessionId === 'new';
-
-      if (isNewChat && !draftKeyRef.current) {
-        draftKeyRef.current = startDraftSession();
-      }
-
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: currentInput,
-      };
-
-      setMessages((prev) => [...prev, userMessage]);
-      setInput('');
-      setIsLoading(true);
-
-      try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [...messages, userMessage],
-            sessionId: sessionId || 'new',
-          }),
-          credentials: 'include',
-        });
-
-        if (!response.ok) throw new Error('Server error');
-
-        const newSessionId = response.headers.get('X-Session-Id');
-
-        if (isNewChat && newSessionId) {
-          promoteDraftToSession(newSessionId);
-          draftKeyRef.current = newSessionId;
-
-          router.replace(`/app/${newSessionId}`, { scroll: false });
-          triggerSidebarRefresh();
-        }
-
-        if (!response.body) throw new Error('No response body');
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        const assistantMessageId = (Date.now() + 1).toString();
-
-        setMessages((prev) => [
-          ...prev,
-          { id: assistantMessageId, role: 'assistant', content: '' },
-        ]);
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMessageId ? { ...m, content: m.content + chunk } : m
-            )
-          );
-        }
-      } catch (err) {
-        console.error('Chat Error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [input, messages, sessionId, router, triggerSidebarRefresh, setMessages, startDraftSession, promoteDraftToSession]
-  );
-
-  return {
-    messages,
-    input,
-    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value),
-    handleSubmit,
-    isLoading,
-    isHistoryLoading,
-  };
-}
-```
-
-## src/lib/prisma.ts
-
-```typescript
-import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    adapter,
-  });
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-export default prisma;
-```
-
-## src/middleware.ts
-
-```typescript
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
-
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname === "/";
-
-    if (isAuth && isAuthPage) {
-      return NextResponse.redirect(new URL("/app", req.url));
-    }
-
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        if (req.nextUrl.pathname === "/") return true;
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: "/",
-    },
-  }
-);
-
-export const config = {
-  matcher: ["/", "/app/:path*"],
-};
-```
-
-## src/store/useChatStore.ts
-
-```typescript
-import { create } from 'zustand';
-
-export type ChatMessage = {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-};
-
-interface ActiveChatSlice {
-  activeKey: string | null;
-  messages: ChatMessage[];
-
-  hydratedSessionIds: Set<string>;
-
-  isAwaitingSessionId: boolean;
-
-  startDraftSession: () => string;
-  setMessages: (updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => void;
-  promoteDraftToSession: (realSessionId: string) => void;
-  loadHistoryForSession: (sessionId: string, messages: ChatMessage[]) => void;
-  markAwaitingSessionId: (waiting: boolean) => void;
-  resetActiveChat: () => void;
-  isHydrated: (sessionId: string) => boolean;
-}
-
-interface SidebarSlice {
-  shouldRefresh: boolean;
-  triggerRefresh: () => void;
-  resetRefresh: () => void;
-}
-
-type ChatStore = ActiveChatSlice & SidebarSlice;
-
-export const useChatStore = create<ChatStore>((set, get) => ({
-  activeKey: null,
-  messages: [],
-  hydratedSessionIds: new Set(),
-  isAwaitingSessionId: false,
-
-  startDraftSession: () => {
-    const draftKey = `draft-${Date.now()}`;
-    set({ activeKey: draftKey, messages: [], isAwaitingSessionId: false });
-    return draftKey;
-  },
-
-  setMessages: (updater) =>
-    set((state) => ({
-      messages: typeof updater === 'function' ? (updater as (prev: ChatMessage[]) => ChatMessage[])(state.messages) : updater,
-    })),
-
-  promoteDraftToSession: (realSessionId) =>
-    set((state) => ({
-      activeKey: realSessionId,
-      hydratedSessionIds: new Set(state.hydratedSessionIds).add(realSessionId),
-      isAwaitingSessionId: false,
-    })),
-
-  loadHistoryForSession: (sessionId, messages) =>
-    set((state) => ({
-      activeKey: sessionId,
-      messages,
-      hydratedSessionIds: new Set(state.hydratedSessionIds).add(sessionId),
-    })),
-
-  markAwaitingSessionId: (waiting) => set({ isAwaitingSessionId: waiting }),
-
-  resetActiveChat: () => set({ activeKey: null, messages: [], isAwaitingSessionId: false }),
-
-  isHydrated: (sessionId) => get().hydratedSessionIds.has(sessionId),
-
-  shouldRefresh: false,
-  triggerRefresh: () => set({ shouldRefresh: true }),
-  resetRefresh: () => set({ shouldRefresh: false }),
-}));
-
-export const selectActiveMessages = (s: ChatStore) => s.messages;
-export const selectActiveKey = (s: ChatStore) => s.activeKey;
-export const selectSidebarRefresh = (s: ChatStore) => s.shouldRefresh;
-```
-
-## src/types/next-auth.d.ts
-
-```typescript
-import { DefaultSession } from "next-auth";
-
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      role?: string;
-    } & DefaultSession["user"];
-  }
-
-  interface User {
-    id: string;
-    role?: string;
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    role?: string;
-  }
-}
-```
-
-## tailwind.config.ts
-
-```typescript
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      colors: {
-        sage: { DEFAULT: '#7a9e7e', light: '#a8c5ac', dark: '#4a7a4f' },
-        cream: '#faf7f2',
-        'warm-white': '#fffef9',
-        earth: { DEFAULT: '#8b6f47', light: '#c4a882' },
-        forest: '#2d5a3d',
-        blush: '#e8b4a0',
-        text: { dark: '#2a2a2a', mid: '#5a5a5a', light: '#8a8a8a' },
-      },
-      fontFamily: {
-        sans: ['var(--font-nunito)', 'sans-serif'],
-        serif: ['var(--font-playfair)', 'serif'],
-      },
-    },
-  },
-  plugins: [],
-};
-export default config;
-```
-
-## tsconfig.json
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": ["node_modules"]
-}
-
-```
-
-
-```
-
-## next.config.ts
-
-```typescript
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
-
-```
-
-## package.json
-
-```json
-{
-  "name": "mindbridge",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:migrate": "prisma migrate deploy",
-    "db:studio": "prisma studio"
-  },
-  "dependencies": {
-    "@ai-sdk/deepseek": "^2.0.38",
-    "@ai-sdk/google": "^3.0.82",
-    "@ai-sdk/openai": "^3.0.71",
-    "@libsql/client": "^0.17.3",
-    "@prisma/adapter-libsql": "^7.8.0",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "ai": "^6.0.205",
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.4.2",
-    "lucide-react": "^1.18.0",
-    "next": "16.2.9",
-    "next-auth": "^4.24.14",
-    "openai": "^6.42.0",
-    "prisma": "^7.8.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-markdown": "^10.1.0",
-    "recharts": "^3.8.1",
-    "sonner": "^2.0.7",
-    "swr": "^2.4.1",
-    "typescript": "^5",
-    "zustand": "^5.0.14"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@tailwindcss/typography": "^0.5.20",
-    "@types/bcrypt": "^6.0.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4",
-    "tsx": "^4.22.4"
-  }
-}
-```
-```
 
 ## prisma.config.ts
 
@@ -2803,199 +958,333 @@ main()
 ```typescript
 "use client";
 
+import { use, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Sparkles, HeartPulse, Brain, ArrowUp } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ArrowUp, Brain, Heart, Sparkles } from "lucide-react";
 import { useChatLogic } from "@/hooks/use-chat-logic";
-import { TypingIndicator } from "@/components/TypingIndicator";
-import { useEffect, useRef, use } from "react";
 
-export default function DashboardPage({ params }: { params: Promise<{ sessionId?: string[] }> }) {
+export default function ChatPage({ params }: { params: Promise<{ sessionId?: string[] }> }) {
   const { data: session } = useSession();
-  const unwrappedParams = use(params);
-  const sessionId = unwrappedParams?.sessionId?.[0];
+  const { sessionId: sessionIdArr } = use(params);
+  const sessionId = sessionIdArr?.[0];
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading } = useChatLogic(sessionId);
+  const { messages, input, handleInputChange, handleSubmit, isLoading, isHistoryLoading } =
+    useChatLogic(sessionId);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-
   const firstName = session?.user?.name?.split(" ")[0] || "there";
 
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
+    const h = new Date().getHours();
+    if (h < 12) return "Good morning";
+    if (h < 18) return "Good afternoon";
     return "Good evening";
   };
 
   const suggestions = [
-    { icon: Brain, text: "I'm feeling really overwhelmed with work today." },
-    { icon: HeartPulse, text: "I've been experiencing a lot of anxiety lately." },
-    { icon: Sparkles, text: "I just want to reflect on my day." },
+    { icon: Sparkles, text: "I just need to vent about my day." },
+    { icon: Brain,    text: "I've been feeling really anxious lately." },
+    { icon: Heart,    text: "I want to reflect on something personal." },
   ];
 
-  const handleSuggestionClick = async (text: string) => {
+  const handleSuggestion = (text: string) => {
     handleInputChange({ target: { value: text } } as any);
-    setTimeout(async () => {
-      const fakeEvent = { preventDefault: () => {} } as any;
-      await handleSubmit(fakeEvent);
+    setTimeout(() => {
+      handleSubmit({ preventDefault: () => {} } as any);
     }, 0);
   };
 
-  // Auto-scroll to bottom smoothly
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: 'smooth'
-    });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     handleInputChange(e);
-    const textarea = e.target;
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`;
+    const el = e.target;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (input.trim() && !isLoading) {
-        const fakeEvent = { preventDefault: () => {} } as any;
-        handleSubmit(fakeEvent);
-      }
+      if (input.trim() && !isLoading) handleSubmit({ preventDefault: () => {} } as any);
     }
   };
 
-  // ---- Render decision, in priority order ----
-  //
-  // 1. We have messages -> always render the chat thread. This is checked
-  //    FIRST and is the load-bearing fix: messages now come from the
-  //    Zustand store (see useChatLogic), which is re-keyed (not cleared)
-  //    when "new" becomes a real sessionId. So at the exact moment
-  //    router.replace fires, `messages` is already the same non-empty
-  //    array it was a millisecond earlier. There is no render frame in
-  //    which sessionId is the new uuid AND messages is empty, because
-  //    those two facts are now updated in the same synchronous store
-  //    write (promoteDraftToSession), not across a fetch boundary.
-  //
-  // 2. Only if there are truly zero messages AND we're fetching a cold
-  //    session's history do we show the skeleton. This path is only ever
-  //    hit for a direct link / refresh into an existing session, never
-  //    for the new -> uuid transition.
-  //
-  // 3. Otherwise, zero messages and not loading -> the welcome screen.
   const showSkeleton = isHistoryLoading && messages.length === 0;
-  const showWelcome = !showSkeleton && messages.length === 0;
+  const showWelcome  = !showSkeleton && messages.length === 0;
 
   return (
-    <div className="flex-1 flex flex-col h-screen bg-slate-50">
-      <div className="flex-1 overflow-y-auto p-6 md:p-8" ref={scrollRef}>
-        <div className="max-w-3xl mx-auto">
-          {showSkeleton ? (
-            <ChatSkeleton />
-          ) : showWelcome ? (
-            <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
-                <Sparkles className="text-teal-600" size={36} />
+    <div
+      className="flex-1 flex flex-col h-full overflow-hidden"
+      style={{ background: "var(--bg-subtle)" }}
+    >
+      <div className="flex-1 overflow-y-auto scroll-thin" ref={scrollRef}>
+        <div className="w-full max-w-4xl mx-auto px-4 pt-8 pb-4">
+
+          {showSkeleton && <ChatSkeleton />}
+
+          {showWelcome && (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center fade-up">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-6"
+                style={{ background: "var(--violet-light)" }}
+              >
+                <Sparkles size={22} style={{ color: "var(--violet)" }} />
               </div>
-              <h1 className="font-serif text-4xl font-semibold text-slate-900 mb-3">
+              <h1
+                className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3"
+                style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}
+              >
                 {getGreeting()}, {firstName}.
               </h1>
-              <p className="text-slate-600 text-lg mb-12 max-w-md">
-                This is a safe space. How are you feeling today?
+              <p className="text-[15px] mb-10 max-w-sm" style={{ color: "var(--text-secondary)" }}>
+                This is a safe space. What's on your mind today?
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
+              <div className="grid sm:grid-cols-3 gap-3 w-full">
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
-                    onClick={() => handleSuggestionClick(s.text)}
-                    className="flex flex-col items-start p-5 bg-white border border-slate-200 hover:border-teal-200 rounded-xl text-left transition-colors hover:bg-slate-50"
+                    onClick={() => handleSuggestion(s.text)}
+                    className="flex flex-col items-start p-4 rounded-xl text-left transition-all fade-up"
+                    style={{
+                      background:   "var(--card)",
+                      border:       "1px solid var(--border)",
+                      animationDelay: `${i * 60}ms`,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--violet-subtle)";
+                      e.currentTarget.style.background  = "var(--violet-light)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--border)";
+                      e.currentTarget.style.background  = "var(--card)";
+                    }}
                   >
-                    <s.icon size={22} className="text-slate-600 mb-3" />
-                    <span className="text-sm text-slate-700 leading-snug">"{s.text}"</span>
+                    <s.icon size={16} style={{ color: "var(--violet)", marginBottom: 10 }} />
+                    <span className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      {s.text}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="space-y-9 pb-24">
-              {messages.map((m) => (
-                <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-6 py-4 text-[15.5px] leading-relaxed rounded-2xl ${
-                    m.role === 'user'
-                      ? 'bg-teal-600 text-white rounded-br-md'
-                      : 'bg-white border border-slate-200 text-slate-800 rounded-bl-md'
-                  }`}>
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+          )}
+
+          {!showSkeleton && !showWelcome && (
+            <div className="space-y-5 pb-2">
+              {messages.map((m, i) => (
+                <div
+                  key={m.id}
+                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} fade-up`}
+                  style={{ animationDelay: `${Math.min(i * 15, 150)}ms` }}
+                >
+                  {/* AI avatar */}
+                  {m.role === "assistant" && (
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+                      style={{ background: "var(--violet-light)" }}
+                    >
+                      <Sparkles size={13} style={{ color: "var(--violet)" }} />
+                    </div>
+                  )}
+
+                  <div
+                    className="max-w-[82%] sm:max-w-[75%] px-4 py-3 text-sm rounded-2xl"
+                    style={m.role === "user" ? {
+                      background: "var(--violet-light)",
+                      color:      "var(--text-primary)",
+                      borderBottomRightRadius: 4,
+                    } : {
+                      background: "var(--card)",
+                      border:     "1px solid var(--border)",
+                      color:      "var(--text-primary)",
+                      boxShadow:  "var(--shadow-xs)",
+                      borderBottomLeftRadius: 4,
+                    }}
+                  >
+                    {m.role === "assistant" ? (
+                      <div className="prose-chat" style={{ lineHeight: 1.65 }}>
+                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p style={{ lineHeight: 1.65 }}>{m.content}</p>
+                    )}
                   </div>
                 </div>
               ))}
-              {isLoading && <TypingIndicator />}
+
+              {/* Typing indicator */}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+                    style={{ background: "var(--violet-light)" }}
+                  >
+                    <Sparkles size={13} style={{ color: "var(--violet)" }} />
+                  </div>
+                  <div
+                    className="px-4 py-3.5 rounded-2xl"
+                    style={{
+                      background: "var(--card)",
+                      border:     "1px solid var(--border)",
+                      boxShadow:  "var(--shadow-xs)",
+                      borderBottomLeftRadius: 4,
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      {[0,1,2].map((i) => (
+                        <span
+                          key={i}
+                          className="typing-dot block w-1.5 h-1.5 rounded-full"
+                          style={{
+                            background:      "var(--text-tertiary)",
+                            animationDelay:  `${i * 0.2}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-slate-200 bg-slate-50 p-6">
-        <div className="max-w-3xl mx-auto">
-          <form onSubmit={handleSubmit} className="relative">
+      <div
+        className="shrink-0 px-4 py-4"
+        style={{
+          background:  "var(--bg)",
+          borderTop:   "1px solid var(--border)",
+        }}
+      >
+        <div className="w-full max-w-2xl mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="relative rounded-xl overflow-hidden"
+            style={{
+              background: "var(--card)",
+              border:     "1px solid var(--border)",
+              boxShadow:  "var(--shadow-sm)",
+            }}
+          >
             <textarea
               value={input}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
+              onChange={handleTextarea}
+              onKeyDown={handleKey}
+              placeholder="Share what's on your mind…"
               rows={1}
-              className="w-full resize-none bg-white border border-slate-200 focus:border-slate-300 focus:outline-none rounded-2xl py-4 pl-6 pr-16 text-slate-900 placeholder:text-slate-400 text-[15.5px] leading-relaxed max-h-[180px] overflow-auto scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="w-full resize-none bg-transparent text-sm outline-none leading-relaxed scroll-thin"
+              style={{
+                padding:   "14px 52px 14px 16px",
+                color:     "var(--text-primary)",
+                maxHeight: "180px",
+              }}
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="absolute right-3 bottom-3 p-3 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white rounded-xl transition-colors"
+              aria-label="Send"
+              className={`absolute right-2.5 bottom-2.5 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${isLoading ? "btn-send-loading" : ""}`}
+              style={{
+                background: (isLoading || !input.trim()) ? "var(--bg-muted)" : "var(--violet)",
+                color:      (isLoading || !input.trim()) ? "var(--text-tertiary)" : "white",
+                cursor:     (isLoading || !input.trim()) ? "not-allowed" : "pointer",
+              }}
             >
-              <ArrowUp size={20} strokeWidth={2.5} />
+              <ArrowUp size={16} strokeWidth={2.5} />
             </button>
           </form>
+          <p className="text-center text-[11px] mt-2.5" style={{ color: "var(--text-tertiary)" }}>
+            MindBridge is not a substitute for professional mental health support.
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-const ChatSkeleton = () => (
-  <div className="space-y-10 pt-8 max-w-3xl mx-auto">
-    <div className="flex justify-start animate-pulse">
-      <div className="w-full max-w-[88%] sm:max-w-[82%]">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-slate-100 rounded-full" />
-          <div className="h-3.5 w-24 bg-slate-100 rounded" />
-        </div>
-        <div className="bg-white border border-slate-100 rounded-2xl rounded-bl-md px-6 py-6">
-          <div className="space-y-3">
-            <div className="h-4 bg-slate-100 rounded w-11/12" />
-            <div className="h-4 bg-slate-100 rounded w-full" />
-            <div className="h-4 bg-slate-100 rounded w-4/5" />
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div className="flex justify-end animate-pulse">
-      <div className="w-full max-w-[85%] sm:max-w-[78%]">
-        <div className="bg-teal-100 rounded-2xl rounded-br-md px-6 py-6">
-          <div className="space-y-3">
-            <div className="h-4 bg-teal-50 rounded w-4/5" />
-            <div className="h-4 bg-teal-50 rounded w-full" />
-            <div className="h-4 bg-teal-50 rounded w-3/4" />
+function ChatSkeleton() {
+  return (
+    <div className="space-y-6 pb-2">
+      {/* AI message skeleton */}
+      <div className="flex justify-start">
+        <div className="skeleton w-7 h-7 rounded-lg shrink-0 mr-2.5 mt-0.5" style={{ borderRadius: 8 }} />
+        <div
+          className="w-full max-w-[82%] sm:max-w-[75%] rounded-2xl overflow-hidden"
+          style={{
+            background:            "var(--card)",
+            border:                "1px solid var(--border)",
+            borderBottomLeftRadius: 4,
+            boxShadow:             "var(--shadow-xs)",
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[92%]" />
+            <div className="skeleton h-3.5 w-[78%]" />
+            <div className="skeleton h-3.5 w-[85%]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <div
+          className="w-full max-w-[70%] sm:max-w-[60%] rounded-2xl overflow-hidden"
+          style={{
+            background:             "var(--violet-light)",
+            borderBottomRightRadius: 4,
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-[88%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-full"  style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-[65%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+          </div>
+        </div>
+      </div>
+
+
+      <div className="flex justify-start">
+        <div className="skeleton w-7 h-7 rounded-lg shrink-0 mr-2.5 mt-0.5" style={{ borderRadius: 8 }} />
+        <div
+          className="w-full max-w-[82%] sm:max-w-[75%] rounded-2xl overflow-hidden"
+          style={{
+            background:            "var(--card)",
+            border:                "1px solid var(--border)",
+            borderBottomLeftRadius: 4,
+            boxShadow:             "var(--shadow-xs)",
+          }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-[95%]" />
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[88%]" />
+            <div className="skeleton h-3.5 w-full" />
+            <div className="skeleton h-3.5 w-[55%]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <div
+          className="w-full max-w-[55%] sm:max-w-[45%] rounded-2xl overflow-hidden"
+          style={{ background: "var(--violet-light)", borderBottomRightRadius: 4 }}
+        >
+          <div className="px-4 py-3 space-y-2.5">
+            <div className="skeleton h-3.5 w-full"  style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
+            <div className="skeleton h-3.5 w-[72%]" style={{ background: "var(--violet-subtle)", opacity: 0.5 }} />
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+}
 ```
 
 ## src/app/(protected)/dashboard/page.tsx
@@ -3003,327 +1292,363 @@ const ChatSkeleton = () => (
 ```typescript
 "use client";
 
-
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import Link from "next/link";
 import {
-  Heart,
-  TrendingUp,
-  Flame,
-  Brain,
-  Zap,
-  MessageSquare,
-  UserCheck,
-  ArrowRight,
-  Sparkles,
-  Moon,
-  Activity,
+  Heart, TrendingUp, Flame, Brain, Zap,
+  MessageSquare, ArrowRight, Sparkles, Moon, Activity,
+  BadgeCheck, Star,
 } from "lucide-react";
 import { MoodTrendChart } from "@/components/mood/MoodTrendChart";
 
-const fetcher = (url: string) =>
-  fetch(url, { credentials: "include" }).then((r) => r.json());
+const fetcher = (url: string) => fetch(url, { credentials: "include" }).then((r) => r.json());
 
 const MOOD_EMOJI: Record<string, string> = {
-  HAPPY: "😊",
-  CALM: "😌",
-  HOPEFUL: "🌟",
-  NEUTRAL: "😐",
-  SAD: "😔",
-  ANXIOUS: "😰",
-  ANGRY: "😤",
-  OVERWHELMED: "😵",
-  LONELY: "💙",
-  FEARFUL: "😨",
+  HAPPY: "😊", CALM: "😌", HOPEFUL: "🌟", NEUTRAL: "😐",
+  SAD: "😔", ANXIOUS: "😰", ANGRY: "😤", OVERWHELMED: "😵",
+  LONELY: "💙", FEARFUL: "😨",
 };
 
-const STRESS_COLOUR: Record<string, string> = {
-  Low: "text-emerald-600 bg-emerald-50",
-  Moderate: "text-amber-600 bg-amber-50",
-  High: "text-red-500 bg-red-50",
-  Critical: "text-red-700 bg-red-100",
+const STRESS: Record<string, { text: string; bg: string }> = {
+  Low:      { text: "#16a34a", bg: "#f0fdf4" },
+  Moderate: { text: "#d97706", bg: "#fffbeb" },
+  High:     { text: "#dc2626", bg: "#fef2f2" },
+  Critical: { text: "#dc2626", bg: "#fef2f2" },
 };
 
 export default function DashboardPage() {
   const { data: session } = useSession();
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
 
-  const { data, isLoading } = useSWR("/api/dashboard", fetcher, {
-    refreshInterval: 30_000,
-  });
+  const { data, isLoading } = useSWR("/api/dashboard", fetcher, { refreshInterval: 30_000 });
 
   if (isLoading) return <DashboardSkeleton />;
 
   const {
-    moodSummary,
-    weeklyTrend,
-    recentMoodEntries,
-    stressScore,
-    latestInsight,
-    recentSessions,
-    recommendedSpecialists,
-    recommendationReason,
+    moodSummary, weeklyTrend, recentMoodEntries, stressScore,
+    latestInsight, recentSessions, recommendedSpecialists, recommendationReason,
   } = data ?? {};
 
-  const topMoodType = recentMoodEntries?.[0]?.moodType ?? null;
+  const topMood  = recentMoodEntries?.[0]?.moodType ?? null;
+  const topSp    = recommendedSpecialists?.[0] ?? null;
+  const stressStyle = stressScore?.label ? STRESS[stressScore.label] : null;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div
+      className="flex-1 overflow-y-auto scroll-thin px-5 py-7 sm:px-7 sm:py-8"
+      style={{ background: "var(--bg-subtle)" }}
+    >
+      <div className="max-w-5xl mx-auto space-y-7 fade-up">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
             Good to see you, {firstName}.
           </h1>
-          <p className="text-slate-500 mt-1">Here's your wellness overview for this week.</p>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+            Here's your wellness overview.
+          </p>
         </div>
 
-        {/* ── Stat Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={<Heart size={20} className="text-rose-500" />}
-            label="Current Mood"
-            value={
-              topMoodType
-                ? `${MOOD_EMOJI[topMoodType] ?? "💭"} ${topMoodType}`
-                : "Not logged"
-            }
-            sub={
-              recentMoodEntries?.[0]?.intensity
-                ? `Intensity ${recentMoodEntries[0].intensity}/10`
-                : undefined
-            }
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard icon={<Heart size={16} />} iconColor="#ef4444" label="Current mood"
+            value={topMood ? `${MOOD_EMOJI[topMood] ?? "💭"} ${topMood.toLowerCase()}` : "Not logged"}
+            sub={recentMoodEntries?.[0]?.intensity ? `Intensity ${recentMoodEntries[0].intensity}/10` : "No logs yet"}
           />
-          <StatCard
-            icon={<Flame size={20} className="text-orange-500" />}
-            label="Mood Streak"
+          <StatCard icon={<Flame size={16} />} iconColor="#f97316" label="Mood streak"
             value={`${moodSummary?.currentStreak ?? 0} day${moodSummary?.currentStreak === 1 ? "" : "s"}`}
-            sub="Keep it going!"
+            sub="Keep it going"
           />
-          <StatCard
-            icon={<Activity size={20} className="text-violet-500" />}
-            label="Avg. Intensity"
-            value={
-              moodSummary?.averageIntensity
-                ? `${moodSummary.averageIntensity}/10`
-                : "—"
-            }
+          <StatCard icon={<Activity size={16} />} iconColor="#8b5cf6" label="Avg. intensity"
+            value={moodSummary?.averageIntensity ? `${moodSummary.averageIntensity}/10` : "—"}
             sub="Last 90 days"
           />
-          <StatCard
-            icon={<Zap size={20} className={stressScore?.label ? STRESS_COLOUR[stressScore.label]?.split(" ")[0] : "text-slate-400"} />}
-            label="Stress Score"
+          <StatCard icon={<Zap size={16} />} iconColor={stressStyle?.text ?? "var(--text-tertiary)"}
+            label="Stress score"
             value={`${stressScore?.score ?? 0}/100`}
             sub={stressScore?.label ?? "—"}
-            valueClass={stressScore ? STRESS_COLOUR[stressScore.label] : undefined}
+            subStyle={stressStyle ? { color: stressStyle.text, background: stressStyle.bg, padding: "1px 6px", borderRadius: 4, fontSize: 11 } : undefined}
           />
         </div>
 
-        {/* ── Weekly Trend Chart + Insight ── */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-                <TrendingUp size={18} className="text-teal-600" />
-                Weekly Mood Trend
-              </h2>
-              <Link
-                href="/mood"
-                className="text-xs text-teal-600 hover:underline flex items-center gap-1"
-              >
-                Full history <ArrowRight size={12} />
+        {/* Chart + Insight */}
+        <div className="grid lg:grid-cols-3 gap-5">
+          <Card className="lg:col-span-2 p-5">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                <TrendingUp size={15} style={{ color: "var(--violet)" }} />
+                Weekly mood trend
+              </div>
+              <Link href="/mood" className="text-xs font-medium" style={{ color: "var(--violet)" }}>
+                Full history →
               </Link>
             </div>
             <MoodTrendChart data={weeklyTrend ?? []} />
-          </div>
+          </Card>
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-3">
-                <Sparkles size={18} className="text-amber-500" />
-                Weekly Insight
-              </h2>
-              {latestInsight ? (
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {latestInsight.content}
-                </p>
-              ) : (
-                <p className="text-sm text-slate-400 italic">
-                  Log your mood daily to unlock AI-generated insights.
-                </p>
-              )}
+          <Card className="p-5 flex flex-col">
+            <div className="flex items-center gap-2 text-sm font-medium mb-4" style={{ color: "var(--text-primary)" }}>
+              <Sparkles size={15} style={{ color: "#f59e0b" }} />
+              Weekly insight
             </div>
-            <Link
-              href="/mood"
-              className="mt-4 text-xs text-teal-600 hover:underline flex items-center gap-1"
-            >
-              Log mood <ArrowRight size={12} />
+            {latestInsight ? (
+              <p className="text-[15px] leading-relaxed flex-1" style={{ color: "var(--text-primary)", fontStyle: "italic" }}>
+                "{latestInsight.content}"
+              </p>
+            ) : (
+              <p className="text-sm flex-1 italic" style={{ color: "var(--text-tertiary)" }}>
+                Log your mood daily to unlock AI-generated insights.
+              </p>
+            )}
+            <Link href="/mood" className="mt-4 text-xs font-medium" style={{ color: "var(--violet)" }}>
+              Log mood →
             </Link>
-          </div>
+          </Card>
         </div>
 
-        {/* ── Additional Stats Row ── */}
+        {/* Extra stats */}
         {(moodSummary?.averageSleepScore || moodSummary?.averageEnergyScore) && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {moodSummary.averageSleepScore && (
-              <StatCard
-                icon={<Moon size={20} className="text-indigo-500" />}
-                label="Avg. Sleep"
-                value={`${moodSummary.averageSleepScore}/10`}
-                sub="Last 90 days"
-              />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {moodSummary.averageSleepScore != null && (
+              <StatCard icon={<Moon size={16} />} iconColor="#6366f1" label="Avg. sleep"
+                value={`${moodSummary.averageSleepScore}/10`} sub="Last 90 days" />
             )}
-            {moodSummary.averageEnergyScore && (
-              <StatCard
-                icon={<Zap size={20} className="text-yellow-500" />}
-                label="Avg. Energy"
-                value={`${moodSummary.averageEnergyScore}/10`}
-                sub="Last 90 days"
-              />
+            {moodSummary.averageEnergyScore != null && (
+              <StatCard icon={<Zap size={16} />} iconColor="#eab308" label="Avg. energy"
+                value={`${moodSummary.averageEnergyScore}/10`} sub="Last 90 days" />
             )}
-            <StatCard
-              icon={<Brain size={20} className="text-teal-500" />}
-              label="Entries Logged"
-              value={`${moodSummary?.totalEntries ?? 0}`}
-              sub="Last 90 days"
-            />
+            <StatCard icon={<Brain size={16} />} iconColor="var(--cyan)" label="Entries logged"
+              value={`${moodSummary?.totalEntries ?? 0}`} sub="Last 90 days" />
           </div>
         )}
 
-        {/* ── Bottom Row: Recent Chats + Recommended Specialist ── */}
-        <div className="grid lg:grid-cols-2 gap-6">
-
-          {/* Recent Journal / Chats */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
-              <MessageSquare size={18} className="text-teal-600" />
-              Recent Conversations
-            </h2>
+        {/* Bottom row */}
+        <div className="grid lg:grid-cols-2 gap-5">
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                <MessageSquare size={15} style={{ color: "var(--violet)" }} />
+                Recent conversations
+              </div>
+              <Link href="/chat" className="text-xs font-medium" style={{ color: "var(--violet)" }}>
+                New chat →
+              </Link>
+            </div>
             {recentSessions?.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-px">
                 {recentSessions.map((s: any) => (
                   <Link
                     key={s.id}
                     href={`/chat/${s.id}`}
-                    className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                    className="group flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors"
+                    style={{ color: "var(--text-primary)" }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-muted)"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                   >
-                    <span className="text-sm text-slate-700 truncate">{s.title ?? "Untitled Chat"}</span>
-                    <ArrowRight size={14} className="text-slate-300 group-hover:text-teal-500 shrink-0 ml-2" />
+                    <span className="text-sm truncate">{s.title ?? "Untitled chat"}</span>
+                    <ArrowRight size={13} style={{ color: "var(--text-tertiary)", flexShrink: 0, marginLeft: 8 }} />
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400">No conversations yet. Start chatting!</p>
+              <Empty msg="No conversations yet." href="/chat" action="Start chatting" />
             )}
-            <Link
-              href="/chat"
-              className="mt-4 inline-flex items-center gap-1 text-xs text-teal-600 hover:underline"
-            >
-              New conversation <ArrowRight size={12} />
-            </Link>
-          </div>
+          </Card>
 
-          {/* Recommended Specialist */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-2">
-              <UserCheck size={18} className="text-teal-600" />
-              Suggested Support
-            </h2>
-            {recommendationReason && (
-              <p className="text-xs text-slate-400 mb-4 leading-relaxed italic">
-                {recommendationReason}
-              </p>
-            )}
-            {recommendedSpecialists?.length > 0 ? (
-              <div className="space-y-3">
-                {recommendedSpecialists.map((sp: any) => (
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                <Heart size={15} style={{ color: "var(--violet)" }} />
+                Specialist match
+              </div>
+              <Link href="/support" className="text-xs font-medium" style={{ color: "var(--violet)" }}>
+                All specialists →
+              </Link>
+            </div>
+            {topSp ? (
+              <div>
+                {recommendationReason && (
+                  <p className="text-xs italic mb-4 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                    {recommendationReason}
+                  </p>
+                )}
+                <div className="flex items-start gap-3">
                   <div
-                    key={sp.id}
-                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold shrink-0"
+                    style={{ background: "var(--violet-light)", color: "var(--violet)" }}
                   >
-                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-semibold text-sm shrink-0">
-                      {sp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                    {topSp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                        {topSp.name}
+                      </span>
+                      {topSp.verified && <BadgeCheck size={14} style={{ color: "var(--cyan)", flexShrink: 0 }} />}
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-800 truncate">{sp.name}</p>
-                      <p className="text-xs text-slate-500 truncate">{sp.title}</p>
-                    </div>
-                    <div className="ml-auto shrink-0 text-xs text-amber-600 font-medium">
-                      ★ {sp.rating}
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>{topSp.title}</p>
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <Star size={11} style={{ color: "#f59e0b", fill: "#f59e0b" }} />
+                      <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{topSp.rating}</span>
+                      <span className="mx-1.5" style={{ color: "var(--border-strong)" }}>·</span>
+                      <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                        {topSp.yearsOfExperience} yrs exp.
+                      </span>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">Chat more to receive personalised suggestions.</p>
+              <Empty msg="Chat more to get personalised specialist recommendations." href="/support" action="Browse specialists" />
             )}
-            <Link
-              href="/support"
-              className="mt-4 inline-flex items-center gap-1 text-xs text-teal-600 hover:underline"
-            >
-              View all specialists <ArrowRight size={12} />
-            </Link>
-          </div>
+          </Card>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────
+
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={className}
+      style={{
+        background: "var(--card)",
+        border:     "1px solid var(--border)",
+        borderRadius: "var(--r-lg)",
+        boxShadow:  "var(--shadow-xs)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function StatCard({
-  icon,
-  label,
-  value,
-  sub,
-  valueClass,
+  icon, iconColor, label, value, sub, subStyle,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  sub?: string;
-  valueClass?: string;
+  icon: React.ReactNode; iconColor: string; label: string;
+  value: string; sub?: string; subStyle?: React.CSSProperties;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-      <div className="flex items-center gap-2 mb-3">
+    <Card className="p-4">
+      <div className="flex items-center gap-1.5 mb-3" style={{ color: iconColor }}>
         {icon}
-        <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+        <span className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-tertiary)" }}>
           {label}
         </span>
       </div>
-      <p
-        className={`text-xl font-semibold ${valueClass ?? "text-slate-900"} truncate`}
-      >
+      <p className="text-xl font-semibold tracking-tight capitalize" style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
         {value}
       </p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+      {sub && (
+        <span className="mt-1.5 inline-block text-[11px]" style={subStyle ?? { color: "var(--text-tertiary)" }}>
+          {sub}
+        </span>
+      )}
+    </Card>
+  );
+}
+
+function Empty({ msg, href, action }: { msg: string; href: string; action: string }) {
+  return (
+    <div className="py-2">
+      <p className="text-sm italic" style={{ color: "var(--text-tertiary)" }}>{msg}</p>
+      <Link href={href} className="mt-2 inline-block text-xs font-medium" style={{ color: "var(--violet)" }}>
+        {action} →
+      </Link>
     </div>
   );
 }
 
+
 function DashboardSkeleton() {
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8 animate-pulse">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="h-8 bg-slate-200 rounded w-1/3" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div
+      className="flex-1 overflow-y-auto px-5 py-7 sm:px-7 sm:py-8"
+      style={{ background: "var(--bg-subtle)" }}
+    >
+      <div className="max-w-5xl mx-auto space-y-7">
+
+        {/* Header */}
+        <div className="space-y-2">
+          <div className="skeleton h-7 w-64 max-w-full" />
+          <div className="skeleton h-4 w-44 max-w-full" />
+        </div>
+
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-5 h-28 border border-slate-100" />
+            <div
+              key={i}
+              className="p-4"
+              style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+            >
+              <div className="skeleton h-3.5 w-24 max-w-full mb-3" />
+              <div className="skeleton h-6 w-28 max-w-full mb-2" />
+              <div className="skeleton h-3 w-20 max-w-full" />
+            </div>
           ))}
         </div>
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-2xl h-56 border border-slate-100" />
-          <div className="bg-white rounded-2xl h-56 border border-slate-100" />
+
+        {/* Chart + Insight */}
+        <div className="grid lg:grid-cols-3 gap-5">
+          <div
+            className="lg:col-span-2 p-5"
+            style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <div className="skeleton h-4 w-36" />
+              <div className="skeleton h-3.5 w-20" />
+            </div>
+            {/* Chart area */}
+            <div className="skeleton w-full h-48" style={{ borderRadius: "var(--r-md)" }} />
+          </div>
+          <div
+            className="p-5"
+            style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+          >
+            <div className="skeleton h-4 w-28 mb-4" />
+            <div className="space-y-2.5 flex-1">
+              <div className="skeleton h-3.5 w-full" />
+              <div className="skeleton h-3.5 w-[90%]" />
+              <div className="skeleton h-3.5 w-[80%]" />
+              <div className="skeleton h-3.5 w-[95%]" />
+              <div className="skeleton h-3.5 w-[70%]" />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom row */}
+        <div className="grid lg:grid-cols-2 gap-5">
+          {[...Array(2)].map((_, i) => (
+            <div
+              key={i}
+              className="p-5"
+              style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="skeleton h-4 w-40" />
+                <div className="skeleton h-3.5 w-16" />
+              </div>
+              <div className="space-y-2.5">
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className="flex items-center justify-between px-3 py-2.5" style={{ borderRadius: "var(--r-md)" }}>
+                    <div className="skeleton h-3.5 w-[65%]" />
+                    <div className="skeleton h-3.5 w-4" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
-
 ```
 
 ## src/app/(protected)/layout.tsx
@@ -3332,251 +1657,271 @@ function DashboardSkeleton() {
 "use client";
 
 import { useRouter, useParams, usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import {
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  Menu,
-  X,
-  History,
-  Smile,
-  HeartHandshake,
-  MessageCircle,
+  LayoutDashboard, MessageSquare, HeartPulse, Users,
+  LogOut, Plus, Menu, X, Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { useChatStore, selectSidebarRefresh } from "@/store/useChatStore";
 
-const fetcher = (url: string) =>
-  fetch(url, { credentials: "include" }).then((res) => res.json());
+const fetcher = (url: string) => fetch(url, { credentials: "include" }).then((r) => r.json());
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-  const router = useRouter();
+const NAV = [
+  { href: "/dashboard",       label: "Overview",  icon: LayoutDashboard },
+  { href: "/chat",      label: "Chat",      icon: MessageSquare   },
+  { href: "/mood",      label: "Mood",      icon: HeartPulse      },
+  { href: "/support",   label: "Support",   icon: Users           },
+];
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const router   = useRouter();
   const pathname = usePathname();
+  const params   = useParams();
+  const { data: session } = useSession();
 
-  const params = useParams();
-  const currentSessionId = Array.isArray(params?.sessionId)
-    ? params.sessionId[0]
-    : undefined;
-
-  const triggerRefresh = useChatStore(selectSidebarRefresh);
-  const resetRefresh = useChatStore((state) => state.resetRefresh);
-  const resetActiveChat = useChatStore((state) => state.resetActiveChat);
+  const currentSessionId = Array.isArray(params?.sessionId) ? params.sessionId[0] : undefined;
+  const triggerRefresh   = useChatStore(selectSidebarRefresh);
+  const resetRefresh     = useChatStore((s) => s.resetRefresh);
+  const resetActiveChat  = useChatStore((s) => s.resetActiveChat);
 
   const { data, mutate } = useSWR("/api/chat/sessions", fetcher, {
     refreshInterval: 4000,
     revalidateOnFocus: true,
   });
-
   const sessions = Array.isArray(data) ? data : [];
 
   useEffect(() => {
-    if (triggerRefresh) {
-      mutate();
-      resetRefresh();
-    }
+    if (triggerRefresh) { mutate(); resetRefresh(); }
   }, [triggerRefresh, mutate, resetRefresh]);
 
-  const handleCreateNewChat = () => {
+  useEffect(() => { setOpen(false); }, [pathname]);
+
+  const handleNewChat = () => {
     resetActiveChat();
     router.push("/chat");
-    setIsMobileDrawerOpen(false);
+    setOpen(false);
   };
 
-  // Helper: active nav item style
-  const navItemClass = (href: string) => {
-    const isActive = pathname === href || (href !== "/chat" && pathname.startsWith(href));
-    return `flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${
-      isActive
-        ? "bg-teal-600/15 text-teal-300 font-medium"
-        : "hover:bg-slate-900 text-slate-400 hover:text-slate-200"
-    }`;
-  };
+  const firstName = session?.user?.name?.split(" ")[0] ?? "";
+  const email     = session?.user?.email ?? "";
+  const initials  = firstName?.[0]?.toUpperCase() ?? "?";
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-100 border-r border-slate-800">
+  const todaySessions   = sessions.filter((s: any) => isToday(s.createdAt));
+  const recentSessions  = sessions.filter((s: any) => !isToday(s.createdAt));
+
+  const SidebarInner = () => (
+    <div className="flex flex-col h-full sidebar-scroll">
+
       {/* Logo */}
-      <div className="px-6 py-8 font-serif text-2xl font-semibold tracking-tighter border-b border-slate-800">
-        🌿 MindBridge
-      </div>
-
-      {/* New Chat Button */}
-      <div className="p-6">
+      <div
+        className="flex items-center justify-between px-4 h-14 shrink-0"
+        style={{ borderBottom: "1px solid var(--sidebar-border)" }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "var(--violet)" }}>
+            <Sparkles size={13} color="white" />
+          </span>
+          <span className="font-semibold text-[14px]" style={{ color: "var(--sidebar-text-active)" }}>
+            MindBridge
+          </span>
+        </div>
         <button
-          onClick={handleCreateNewChat}
-          className="w-full flex items-center justify-center gap-3 bg-teal-600 hover:bg-teal-700 text-white py-3 px-4 rounded-lg transition-colors font-medium"
+          onClick={() => setOpen(false)}
+          className="lg:hidden p-1 rounded"
+          style={{ color: "var(--sidebar-text)" }}
+          aria-label="Close sidebar"
         >
-          <Plus size={20} /> New Chat
+          <X size={16} />
         </button>
       </div>
 
+      {/* New chat */}
+      <div className="px-3 py-3 shrink-0">
+        <button
+          onClick={handleNewChat}
+          className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+          style={{ background: "var(--sidebar-hover)", color: "var(--sidebar-text)" }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "var(--sidebar-hover)"}
+        >
+          <Plus size={15} strokeWidth={2} />
+          New chat
+        </button>
+      </div>
+
+      {/* Nav */}
       <nav
-        className="flex-1 px-2 overflow-y-auto pb-6 sidebar-scroll"
-        style={{ scrollbarColor: "#334155 transparent", scrollbarWidth: "thin" }}
+        className="px-3 pb-3 shrink-0"
+        style={{ borderBottom: "1px solid var(--sidebar-border)" }}
       >
-        {/* ── Primary Navigation ── */}
-        <div className="px-1 mb-6">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3 px-3">
-            Menu
-          </div>
-          <Link
-            href="/dashboard"
-            className={navItemClass("/dashboard")}
-          >
-            <LayoutDashboard size={18} /> Dashboard
-          </Link>
-          {/* <Link
-            href="/chat"
-            onClick={resetActiveChat}
-            className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors mt-0.5 ${
-              pathname === "/chat" && !currentSessionId
-                ? "bg-teal-600/15 text-teal-300 font-medium"
-                : "hover:bg-slate-900 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <MessageCircle size={18} /> Chat
-          </Link> */}
-          <Link
-            href="/mood"
-            className={navItemClass("/mood")}
-          >
-            <Smile size={18} /> Mood Tracker
-          </Link>
-          <Link
-            href="/support"
-            className={navItemClass("/support")}
-          >
-            <HeartHandshake size={18} /> Support
-          </Link>
-        </div>
-
-        {/* === TODAY SECTION === */}
-        <div className="px-1 mb-8">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-            <History size={14} /> Today
-          </div>
-          <div className="space-y-0.5 pr-2">
-            {sessions
-              .filter((s: any) => isToday(s.createdAt) || s.title === "New Chat")
-              .map((s: any) => {
-                const isActive = s.id === currentSessionId;
-                return (
-                  <Link
-                    key={s.id}
-                    href={`/chat/${s.id}`}
-                    className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
-                      isActive
-                        ? "bg-teal-600/15 text-teal-300 font-medium"
-                        : "text-slate-300 hover:text-slate-100 hover:bg-slate-900"
-                    }`}
-                  >
-                    {s.title || "New Chat"}
-                  </Link>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* === RECENT SECTION === */}
-        <div className="px-1">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">
-            <History size={14} /> Recent
-          </div>
-          <div className="space-y-0.5 pr-2">
-            {sessions
-              .filter((s: any) => !isToday(s.createdAt) && s.title !== "New Chat")
-              .map((s: any) => {
-                const isActive = s.id === currentSessionId;
-                return (
-                  <Link
-                    key={s.id}
-                    href={`/chat/${s.id}`}
-                    className={`block px-4 py-2.5 text-sm rounded-lg transition-colors truncate ${
-                      isActive
-                        ? "bg-teal-600/15 text-teal-300 font-medium"
-                        : "text-slate-300 hover:text-slate-100 hover:bg-slate-900"
-                    }`}
-                  >
-                    {s.title || "Untitled Chat"}
-                  </Link>
-                );
-              })}
-          </div>
-        </div>
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const active = href === "/chat" ? pathname === "/chat" : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm mb-0.5 transition-colors"
+              style={{
+                color:      active ? "var(--sidebar-text-active)" : "var(--sidebar-text)",
+                background: active ? "var(--sidebar-active)" : "transparent",
+                borderLeft: active ? "2px solid var(--sidebar-active-border)" : "2px solid transparent",
+              }}
+            >
+              <Icon size={15} strokeWidth={1.75} />
+              {label}
+            </Link>
+          );
+        })}
       </nav>
 
-      {/* Sign Out */}
-      <div className="p-6 border-t border-slate-800 mt-auto">
+      {/* Chat history */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 sidebar-scroll">
+        {todaySessions.length > 0 && (
+          <div className="mb-4">
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.2)" }}>
+              Today
+            </p>
+            {todaySessions.map((s: any) => (
+              <SessionItem key={s.id} s={s} active={s.id === currentSessionId} />
+            ))}
+          </div>
+        )}
+        {recentSessions.length > 0 && (
+          <div>
+            <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.2)" }}>
+              Previous
+            </p>
+            {recentSessions.map((s: any) => (
+              <SessionItem key={s.id} s={s} active={s.id === currentSessionId} />
+            ))}
+          </div>
+        )}
+        {sessions.length === 0 && (
+          <p className="px-3 text-xs italic" style={{ color: "rgba(255,255,255,0.2)" }}>
+            No conversations yet.
+          </p>
+        )}
+      </div>
+
+      {/* User */}
+      <div className="px-3 py-3 shrink-0" style={{ borderTop: "1px solid var(--sidebar-border)" }}>
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg mb-1">
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
+            style={{ background: "var(--violet)", color: "white" }}
+          >
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium truncate" style={{ color: "var(--sidebar-text-active)" }}>
+              {firstName}
+            </p>
+            <p className="text-[11px] truncate" style={{ color: "rgba(255,255,255,0.25)" }}>
+              {email}
+            </p>
+          </div>
+        </div>
         <button
           onClick={() => signOut()}
-          className="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-400 hover:bg-slate-900 hover:text-red-400 rounded-lg transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors"
+          style={{ color: "rgba(255,255,255,0.3)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#f87171"; e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; e.currentTarget.style.background = "transparent"; }}
         >
-          <LogOut size={18} /> Sign out
+          <LogOut size={14} />
+          Sign out
         </button>
       </div>
     </div>
   );
 
   return (
-    <div className="h-screen flex bg-slate-50 overflow-hidden">
-      {/* Mobile Menu Trigger */}
-      <button
-        onClick={() => setIsMobileDrawerOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white border border-slate-200 rounded-lg"
-      >
-        <Menu size={22} />
-      </button>
+    <div className="h-screen flex overflow-hidden" style={{ background: "var(--bg-subtle)" }}>
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block w-72 shrink-0 h-screen overflow-hidden">
-        <SidebarContent />
+      {/* Desktop sidebar */}
+      <aside
+        className="hidden lg:flex w-60 shrink-0 h-screen flex-col"
+        style={{ background: "var(--sidebar-bg)" }}
+      >
+        <SidebarInner />
       </aside>
 
-      {/* Mobile Drawer */}
-      {isMobileDrawerOpen && (
+      {/* Mobile overlay */}
+      {open && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-72 h-full bg-slate-950 relative">
-            <button
-              onClick={() => setIsMobileDrawerOpen(false)}
-              className="absolute right-4 top-6 p-2 text-slate-400 hover:text-slate-200"
-            >
-              <X size={24} />
-            </button>
-            <SidebarContent />
+          <div
+            className="w-60 h-full flex flex-col"
+            style={{ background: "var(--sidebar-bg)" }}
+          >
+            <SidebarInner />
           </div>
           <div
-            className="flex-1 bg-black/60"
-            onClick={() => setIsMobileDrawerOpen(false)}
+            className="flex-1 backdrop-blur-sm"
+            style={{ background: "var(--overlay)" }}
+            onClick={() => setOpen(false)}
           />
         </div>
       )}
 
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {children}
-      </main>
+      {/* Main */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Mobile top bar */}
+        <div
+          className="lg:hidden flex items-center h-14 px-4 shrink-0"
+          style={{ borderBottom: "1px solid var(--border)", background: "var(--bg)" }}
+        >
+          <button
+            onClick={() => setOpen(true)}
+            className="p-2 -ml-1 rounded-md transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+            aria-label="Open sidebar"
+          >
+            <Menu size={18} />
+          </button>
+          <div className="flex items-center gap-1.5 ml-2">
+            <span className="w-5 h-5 rounded flex items-center justify-center" style={{ background: "var(--violet)" }}>
+              <Sparkles size={11} color="white" />
+            </span>
+            <span className="font-semibold text-sm tracking-tight" style={{ color: "var(--text-primary)" }}>
+              MindBridge
+            </span>
+          </div>
+        </div>
+
+        <main className="flex-1 overflow-hidden flex flex-col">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
 
-/* Helper Functions */
+function SessionItem({ s, active }: { s: any; active: boolean }) {
+  return (
+    <Link
+      href={`/chat/${s.id}`}
+      className="block px-3 py-2 text-xs rounded-lg mb-0.5 truncate transition-colors"
+      style={{
+        color:      active ? "var(--sidebar-text-active)" : "var(--sidebar-text)",
+        background: active ? "var(--sidebar-active)"      : "transparent",
+      }}
+      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "var(--sidebar-hover)"; }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
+    >
+      {s.title || "Untitled chat"}
+    </Link>
+  );
+}
+
 const isToday = (date?: string): boolean => {
   if (!date) return false;
-  const d = new Date(date);
-  const now = new Date();
-  return (
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear()
-  );
+  const d = new Date(date), n = new Date();
+  return d.getDate() === n.getDate() && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
 };
-
 ```
 
 ## src/app/(protected)/mood/page.tsx
@@ -3584,769 +1929,715 @@ const isToday = (date?: string): boolean => {
 ```typescript
 "use client";
 
-
 import { useState } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
-import {
-  Smile,
-  Moon,
-  Zap,
-  Calendar,
-  PlusCircle,
-  X,
-  ChevronDown,
-  TrendingUp,
-} from "lucide-react";
+import { PlusCircle, X, TrendingUp, Smile } from "lucide-react";
 import { MoodTrendChart } from "@/components/mood/MoodTrendChart";
 import { MoodDistributionChart } from "@/components/mood/MoodDistributionChart";
 
-const fetcher = (url: string) =>
-  fetch(url, { credentials: "include" }).then((r) => r.json());
+const fetcher = (url: string) => fetch(url, { credentials: "include" }).then((r) => r.json());
 
-const MOOD_TYPES = [
-  { value: "HAPPY", label: "Happy", emoji: "😊" },
-  { value: "CALM", label: "Calm", emoji: "😌" },
-  { value: "HOPEFUL", label: "Hopeful", emoji: "🌟" },
-  { value: "NEUTRAL", label: "Neutral", emoji: "😐" },
-  { value: "LONELY", label: "Lonely", emoji: "💙" },
-  { value: "ANXIOUS", label: "Anxious", emoji: "😰" },
-  { value: "SAD", label: "Sad", emoji: "😔" },
-  { value: "OVERWHELMED", label: "Overwhelmed", emoji: "😵" },
-  { value: "ANGRY", label: "Angry", emoji: "😤" },
-  { value: "FEARFUL", label: "Fearful", emoji: "😨" },
+const MOODS = [
+  { value: "HAPPY",       emoji: "😊", label: "Happy"       },
+  { value: "CALM",        emoji: "😌", label: "Calm"        },
+  { value: "HOPEFUL",     emoji: "🌟", label: "Hopeful"     },
+  { value: "NEUTRAL",     emoji: "😐", label: "Neutral"     },
+  { value: "LONELY",      emoji: "💙", label: "Lonely"      },
+  { value: "ANXIOUS",     emoji: "😰", label: "Anxious"     },
+  { value: "SAD",         emoji: "😔", label: "Sad"         },
+  { value: "OVERWHELMED", emoji: "😵", label: "Overwhelmed" },
+  { value: "ANGRY",       emoji: "😤", label: "Angry"       },
+  { value: "FEARFUL",     emoji: "😨", label: "Fearful"     },
 ];
 
-export default function MoodPage() {
-  const [showForm, setShowForm] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    moodType: "",
-    intensity: 5,
-    note: "",
-    sleepScore: "" as string | number,
-    energyScore: "" as string | number,
-  });
+const FORM_INIT = { moodType: "", intensity: 5, note: "", sleepScore: "" as string|number, energyScore: "" as string|number };
 
-  const { data: entries, mutate: mutateEntries } = useSWR("/api/mood?limit=14", fetcher);
-  const { data: summaryData, mutate: mutateSummary } = useSWR("/api/mood/summary", fetcher);
+export default function MoodPage() {
+  const [showForm,   setShowForm]   = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState(FORM_INIT);
+
+  const { data: entries,  mutate: mutateEntries  } = useSWR("/api/mood?limit=14", fetcher);
+  const { data: summary,  mutate: mutateSummary  } = useSWR("/api/mood/summary",  fetcher);
 
   const handleSubmit = async () => {
-    if (!form.moodType) {
-      toast.error("Please select a mood type.");
-      return;
-    }
+    if (!form.moodType) { toast.error("Please select a mood type."); return; }
     setSubmitting(true);
     try {
       const res = await fetch("/api/mood", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
         body: JSON.stringify({
-          value: form.intensity,
-          moodType: form.moodType,
-          intensity: form.intensity,
+          value: form.intensity, moodType: form.moodType, intensity: form.intensity,
           note: form.note || undefined,
-          sleepScore: form.sleepScore !== "" ? Number(form.sleepScore) : undefined,
+          sleepScore:  form.sleepScore  !== "" ? Number(form.sleepScore)  : undefined,
           energyScore: form.energyScore !== "" ? Number(form.energyScore) : undefined,
         }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Mood logged!");
-      setForm({ moodType: "", intensity: 5, note: "", sleepScore: "", energyScore: "" });
+      toast.success("Mood logged.");
+      setForm(FORM_INIT);
       setShowForm(false);
-      mutateEntries();
-      mutateSummary();
-    } catch {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+      mutateEntries(); mutateSummary();
+    } catch { toast.error("Something went wrong. Try again."); }
+    finally { setSubmitting(false); }
   };
 
-  const { summary, weeklyTrend } = summaryData ?? {};
+  const { summary: stats, weeklyTrend } = summary ?? {};
+  const isLoading = !entries || !summary;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="flex-1 overflow-y-auto scroll-thin px-5 py-7 sm:px-7 sm:py-8" style={{ background: "var(--bg-subtle)" }}>
+      <div className="max-w-4xl mx-auto space-y-7 fade-up">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-3xl font-semibold text-slate-900">Mood Tracker</h1>
-            <p className="text-slate-500 mt-1">Track how you're feeling over time.</p>
+            <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+              Mood tracker
+            </h1>
+            <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+              Track how you feel over time.
+            </p>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all"
+            style={{ background: "var(--violet)", color: "white" }}
           >
-            <PlusCircle size={18} /> Log Mood
+            <PlusCircle size={15} />
+            Log mood
           </button>
         </div>
 
-        {/* ── Log Form Modal ── */}
-        {showForm && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="font-semibold text-slate-900 text-lg">How are you feeling?</h2>
-                <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600">
-                  <X size={20} />
-                </button>
+        {isLoading ? <MoodSkeleton /> : (
+          <>
+            {/* Summary */}
+            {stats && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: "Total logs",    value: stats.totalEntries        },
+                  { label: "Avg intensity", value: `${stats.averageIntensity}/10` },
+                  { label: "Avg sleep",     value: stats.averageSleepScore  ? `${stats.averageSleepScore}/10`  : "—" },
+                  { label: "Avg energy",    value: stats.averageEnergyScore ? `${stats.averageEnergyScore}/10` : "—" },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    className="p-4"
+                    style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-xs)" }}
+                  >
+                    <p className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: "var(--text-tertiary)" }}>
+                      {s.label}
+                    </p>
+                    <p className="text-xl font-semibold" style={{ color: "var(--text-primary)" }}>{s.value}</p>
+                  </div>
+                ))}
               </div>
+            )}
 
-              {/* Mood Type Selection */}
-              <div className="mb-5">
-                <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">
-                  Mood
-                </label>
-                <div className="grid grid-cols-5 gap-2">
-                  {MOOD_TYPES.map((m) => (
-                    <button
-                      key={m.value}
-                      onClick={() => setForm((p) => ({ ...p, moodType: m.value }))}
-                      className={`flex flex-col items-center py-2 rounded-xl border text-xs transition-all ${
-                        form.moodType === m.value
-                          ? "border-teal-500 bg-teal-50 text-teal-700"
-                          : "border-slate-200 hover:border-slate-300 text-slate-600"
-                      }`}
-                    >
-                      <span className="text-xl mb-1">{m.emoji}</span>
-                      {m.label}
-                    </button>
-                  ))}
+            {/* Charts */}
+            <div className="grid md:grid-cols-2 gap-5">
+              {[
+                { title: "Weekly trend",      icon: <TrendingUp size={15} />, chart: <MoodTrendChart data={weeklyTrend ?? []} /> },
+                { title: "Mood distribution", icon: <Smile size={15} />,      chart: <MoodDistributionChart distribution={stats?.moodDistribution ?? {}} /> },
+              ].map((c) => (
+                <div
+                  key={c.title}
+                  className="p-5"
+                  style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-xs)" }}
+                >
+                  <div className="flex items-center gap-2 text-sm font-medium mb-5" style={{ color: "var(--text-primary)" }}>
+                    <span style={{ color: "var(--violet)" }}>{c.icon}</span>
+                    {c.title}
+                  </div>
+                  {c.chart}
                 </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Intensity Slider */}
-              <div className="mb-5">
-                <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">
-                  Intensity — {form.intensity}/10
-                </label>
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  value={form.intensity}
-                  onChange={(e) => setForm((p) => ({ ...p, intensity: Number(e.target.value) }))}
-                  className="w-full accent-teal-600"
-                />
-                <div className="flex justify-between text-xs text-slate-400 mt-1">
-                  <span>Mild</span><span>Moderate</span><span>Intense</span>
+            {/* Recent logs */}
+            <div
+              className="p-5"
+              style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-xs)" }}
+            >
+              <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Recent logs</h2>
+              {Array.isArray(entries) && entries.length > 0 ? (
+                <div className="space-y-px">
+                  {entries.map((e: any) => {
+                    const m = MOODS.find((x) => x.value === e.moodType);
+                    return (
+                      <div
+                        key={e.id}
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors"
+                        onMouseEnter={(el) => el.currentTarget.style.background = "var(--bg-muted)"}
+                        onMouseLeave={(el) => el.currentTarget.style.background = "transparent"}
+                      >
+                        <span className="text-xl shrink-0 leading-none">{m?.emoji ?? "💭"}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium capitalize" style={{ color: "var(--text-primary)" }}>
+                              {m?.label ?? e.moodType?.toLowerCase()}
+                            </span>
+                            {e.intensity && (
+                              <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                                Intensity {e.intensity}/10
+                              </span>
+                            )}
+                          </div>
+                          {e.note && (
+                            <p className="text-xs mt-0.5 truncate" style={{ color: "var(--text-tertiary)" }}>
+                              {e.note}
+                            </p>
+                          )}
+                        </div>
+                        <span className="text-xs shrink-0" style={{ color: "var(--text-tertiary)" }}>
+                          {new Date(e.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              ) : (
+                <p className="text-sm italic py-2" style={{ color: "var(--text-tertiary)" }}>
+                  No logs yet. Tap "Log mood" to get started.
+                </p>
+              )}
+            </div>
+          </>
+        )}
+      </div>
 
-              {/* Optional Fields */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div>
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 block flex items-center gap-1">
-                    <Moon size={11} /> Sleep
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    placeholder="1-10"
-                    value={form.sleepScore}
-                    onChange={(e) => setForm((p) => ({ ...p, sleepScore: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 block flex items-center gap-1">
-                    <Zap size={11} /> Energy
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    placeholder="1-10"
-                    value={form.energyScore}
-                    onChange={(e) => setForm((p) => ({ ...p, energyScore: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-400"
-                  />
-                </div>
-              </div>
-
-              {/* Note */}
-              <div className="mb-6">
-                <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 block">
-                  Note (optional)
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Anything on your mind?"
-                  value={form.note}
-                  onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-400 resize-none"
-                />
-              </div>
-
+      {showForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          style={{ background: "var(--overlay)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}
+        >
+          <div
+            className="w-full max-w-md p-5 fade-up"
+            style={{ background: "var(--card)", borderRadius: "var(--r-xl)", boxShadow: "var(--shadow-lg)" }}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-semibold" style={{ color: "var(--text-primary)" }}>How are you feeling?</h2>
               <button
-                onClick={handleSubmit}
-                disabled={submitting || !form.moodType}
-                className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white py-3 rounded-xl font-medium text-sm transition-colors"
+                onClick={() => setShowForm(false)}
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: "var(--text-tertiary)" }}
               >
-                {submitting ? "Saving…" : "Save Mood"}
+                <X size={16} />
               </button>
             </div>
-          </div>
-        )}
 
-        {/* ── Stats Row ── */}
-        {summary && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SummaryCard icon={<Calendar size={16} />} label="Total Logs" value={summary.totalEntries} />
-            <SummaryCard icon={<Smile size={16} />} label="Avg Intensity" value={`${summary.averageIntensity}/10`} />
-            {summary.averageSleepScore && (
-              <SummaryCard icon={<Moon size={16} />} label="Avg Sleep" value={`${summary.averageSleepScore}/10`} />
-            )}
-            {summary.averageEnergyScore && (
-              <SummaryCard icon={<Zap size={16} />} label="Avg Energy" value={`${summary.averageEnergyScore}/10`} />
-            )}
-          </div>
-        )}
-
-        {/* ── Charts ── */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
-              <TrendingUp size={18} className="text-teal-600" /> Weekly Trend
-            </h2>
-            <MoodTrendChart data={weeklyTrend ?? []} />
-          </div>
-
-          <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <h2 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
-              <Smile size={18} className="text-teal-600" /> Mood Distribution
-            </h2>
-            <MoodDistributionChart distribution={summary?.moodDistribution ?? {}} />
-          </div>
-        </div>
-
-        {/* ── Recent Entries ── */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-          <h2 className="font-semibold text-slate-800 mb-4">Recent Logs</h2>
-          {Array.isArray(entries) && entries.length > 0 ? (
-            <div className="space-y-3">
-              {entries.map((entry: any) => {
-                const mood = MOOD_TYPES.find((m) => m.value === entry.moodType);
-                return (
-                  <div
-                    key={entry.id}
-                    className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl"
-                  >
-                    <span className="text-2xl">{mood?.emoji ?? "💭"}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium text-slate-800">
-                          {mood?.label ?? entry.moodType ?? `Value: ${entry.value}`}
-                        </span>
-                        {entry.intensity && (
-                          <span className="text-xs text-slate-400">
-                            Intensity {entry.intensity}/10
-                          </span>
-                        )}
-                        {entry.sleepScore && (
-                          <span className="text-xs text-indigo-500">
-                            😴 Sleep {entry.sleepScore}/10
-                          </span>
-                        )}
-                        {entry.energyScore && (
-                          <span className="text-xs text-amber-500">
-                            ⚡ Energy {entry.energyScore}/10
-                          </span>
-                        )}
-                      </div>
-                      {entry.note && (
-                        <p className="text-xs text-slate-500 mt-1 truncate">{entry.note}</p>
-                      )}
-                    </div>
-                    <span className="text-xs text-slate-400 shrink-0">
-                      {new Date(entry.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
-                );
-              })}
+            {/* Mood grid */}
+            <div className="mb-5">
+              <Label>Mood</Label>
+              <div className="grid grid-cols-5 gap-1.5 mt-2">
+                {MOODS.map((m) => {
+                  const active = form.moodType === m.value;
+                  return (
+                    <button
+                      key={m.value}
+                      type="button"
+                      onClick={() => setForm((p) => ({ ...p, moodType: m.value }))}
+                      className="flex flex-col items-center py-2.5 rounded-lg border transition-all"
+                      style={{
+                        borderColor: active ? "var(--violet)" : "var(--border)",
+                        background:  active ? "var(--violet-light)" : "transparent",
+                      }}
+                    >
+                      <span className="text-lg leading-none">{m.emoji}</span>
+                      <span
+                        className="text-[9px] mt-1 font-medium"
+                        style={{ color: active ? "var(--violet)" : "var(--text-tertiary)" }}
+                      >
+                        {m.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-slate-400 italic">No mood logs yet.</p>
-          )}
+
+            {/* Intensity */}
+            <div className="mb-5">
+              <Label>Intensity — {form.intensity}/10</Label>
+              <input
+                type="range" min={1} max={10} value={form.intensity}
+                onChange={(e) => setForm((p) => ({ ...p, intensity: Number(e.target.value) }))}
+                className="w-full mt-2"
+              />
+              <div className="flex justify-between text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
+                <span>Mild</span><span>Moderate</span><span>Intense</span>
+              </div>
+            </div>
+
+            {/* Sleep + Energy */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <FormField label="Sleep score">
+                <FormInput type="number" min={1} max={10} placeholder="1–10"
+                  value={form.sleepScore}
+                  onChange={(e) => setForm((p) => ({ ...p, sleepScore: e.target.value }))} />
+              </FormField>
+              <FormField label="Energy score">
+                <FormInput type="number" min={1} max={10} placeholder="1–10"
+                  value={form.energyScore}
+                  onChange={(e) => setForm((p) => ({ ...p, energyScore: e.target.value }))} />
+              </FormField>
+            </div>
+
+            {/* Note */}
+            <div className="mb-5">
+              <Label>Note (optional)</Label>
+              <textarea
+                rows={2}
+                placeholder="Anything on your mind?"
+                value={form.note}
+                onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
+                className="w-full mt-2 px-3 py-2.5 text-sm resize-none rounded-lg outline-none transition-all"
+                style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={submitting || !form.moodType}
+              className="w-full py-2.5 text-sm font-medium rounded-lg transition-all"
+              style={{ background: "var(--violet)", color: "white", opacity: (submitting || !form.moodType) ? 0.5 : 1 }}
+            >
+              {submitting ? "Saving…" : "Save mood"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>{children}</p>;
+}
+
+function FormField({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
+}
+
+function FormInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className="w-full px-3 py-2.5 text-sm rounded-lg outline-none transition-all"
+      style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+      {...props}
+    />
+  );
+}
+
+
+function MoodSkeleton() {
+  return (
+    <div className="space-y-7">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="p-4"
+            style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+          >
+            <div className="skeleton h-3 w-20 max-w-full mb-2.5" />
+            <div className="skeleton h-6 w-16 max-w-full" />
+          </div>
+        ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid md:grid-cols-2 gap-5">
+        {[...Array(2)].map((_, i) => (
+          <div
+            key={i}
+            className="p-5"
+            style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+          >
+            <div className="skeleton h-4 w-32 mb-5" />
+            <div className="skeleton w-full h-44" style={{ borderRadius: "var(--r-md)" }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Log list */}
+      <div
+        className="p-5"
+        style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+      >
+        <div className="skeleton h-4 w-24 mb-4" />
+        <div className="space-y-1">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-3 py-3">
+              <div className="skeleton w-8 h-8 shrink-0" style={{ borderRadius: "var(--r-sm)" }} />
+              <div className="flex-1 space-y-1.5">
+                <div className="skeleton h-3.5 w-[55%] max-w-full" />
+                <div className="skeleton h-3 w-[35%] max-w-full" />
+              </div>
+              <div className="skeleton h-3 w-10 shrink-0" />
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
-
-function SummaryCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4">
-      <div className="flex items-center gap-1.5 text-teal-600 mb-2">{icon}
-        <span className="text-xs text-slate-400 uppercase tracking-wider font-medium">{label}</span>
-      </div>
-      <p className="text-xl font-semibold text-slate-900">{value}</p>
-    </div>
-  );
-}
-
 ```
 
 ## src/app/(protected)/support/page.tsx
 
 ```typescript
+
 "use client";
 
-
-import useSWR from "swr";
 import { useState } from "react";
+import useSWR from "swr";
 import {
-  Star,
-  MapPin,
-  Globe,
-  Clock,
-  Video,
-  Users,
-  BookOpen,
-  Heart,
-  Brain,
-  Moon,
-  Wind,
-  Shield,
-  ChevronDown,
-  ChevronUp,
-  BadgeCheck,
+  Star, MapPin, Video, Users, Globe, Clock, BookOpen,
+  Brain, Heart, Moon, Wind, Shield, ChevronDown, BadgeCheck, Mail, Phone,
 } from "lucide-react";
 
-const fetcher = (url: string) =>
-  fetch(url, { credentials: "include" }).then((r) => r.json());
+const fetcher = (url: string) => fetch(url, { credentials: "include" }).then((r) => r.json());
 
-const CONSULT_LABELS: Record<string, string> = {
-  virtual: "Virtual",
-  physical: "In-Person",
-  both: "Virtual & In-Person",
-};
-
-const CONSULT_ICON: Record<string, React.ReactNode> = {
-  virtual: <Video size={12} />,
-  physical: <Users size={12} />,
-  both: <Globe size={12} />,
+const CONSULT: Record<string, { icon: React.ReactNode; label: string }> = {
+  virtual:  { icon: <Video  size={11} />, label: "Virtual"            },
+  physical: { icon: <Users  size={11} />, label: "In-Person"          },
+  both:     { icon: <Globe  size={11} />, label: "Virtual & In-Person" },
 };
 
 export default function SupportPage() {
-  const [activeTab, setActiveTab] = useState<"recommended" | "all">("recommended");
-  const [expandedResource, setExpandedResource] = useState<string | null>(null);
+  const [tab,      setTab]      = useState<"recommended" | "all">("recommended");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
-  const { data: recData, isLoading: recLoading } = useSWR(
-    "/api/specialists?recommended=true",
-    fetcher
-  );
+  const { data: recData,  isLoading: recLoading  } = useSWR("/api/specialists?recommended=true", fetcher);
+  const { data: allData,  isLoading: allLoading  } = useSWR(tab === "all" ? "/api/specialists" : null, fetcher);
 
-  const { data: allSpecialists, isLoading: allLoading } = useSWR(
-    activeTab === "all" ? "/api/specialists" : null,
-    fetcher
-  );
+  const specialists = tab === "recommended" ? (recData?.specialists ?? []) : (Array.isArray(allData) ? allData : []);
+  const loading     = tab === "recommended" ? recLoading : allLoading;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-10">
+    <div className="flex-1 overflow-y-auto scroll-thin px-5 py-7 sm:px-7 sm:py-8" style={{ background: "var(--bg-subtle)" }}>
+      <div className="max-w-4xl mx-auto space-y-8 fade-up">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-slate-900">Support & Resources</h1>
-          <p className="text-slate-500 mt-1">
-            Find professional support tailored to your journey. All recommendations are
-            category-based — never a diagnosis.
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+            Support & resources
+          </h1>
+          <p className="text-sm mt-1 max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Find professional support tailored to your emotional patterns.
           </p>
         </div>
 
-        {/* ── Tabs ── */}
-        <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+        {/* Tabs */}
+        <div
+          className="flex gap-1 p-1 w-fit rounded-lg"
+          style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
+        >
           {[
-            { key: "recommended", label: "Recommended For You" },
-            { key: "all", label: "All Specialists" },
-          ].map((tab) => (
+            { key: "recommended", label: "For you"       },
+            { key: "all",         label: "All specialists" },
+          ].map((t) => (
             <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab.key
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
+              key={t.key}
+              onClick={() => setTab(t.key as any)}
+              className="px-4 py-1.5 text-sm font-medium rounded-md transition-all"
+              style={{
+                background: tab === t.key ? "var(--card)" : "transparent",
+                color:      tab === t.key ? "var(--text-primary)" : "var(--text-secondary)",
+                boxShadow:  tab === t.key ? "var(--shadow-xs)" : "none",
+              }}
             >
-              {tab.label}
+              {t.label}
             </button>
           ))}
         </div>
 
-        {/* ── Recommended Specialists ── */}
-        {activeTab === "recommended" && (
-          <section className="space-y-6">
-            {recData?.reason && (
-              <div className="bg-teal-50 border border-teal-100 rounded-2xl p-5">
-                <p className="text-sm text-teal-800 leading-relaxed">
-                  <span className="font-semibold">Why these specialists?</span>{" "}
-                  {recData.reason}
-                </p>
-              </div>
-            )}
-
-            {recLoading ? (
-              <SpecialistSkeleton count={3} />
-            ) : recData?.specialists?.length > 0 ? (
-              <div className="space-y-4">
-                {recData.specialists.map((sp: any) => (
-                  <SpecialistCard key={sp.id} specialist={sp} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-400 italic">
-                Chat more to receive personalised recommendations.
-              </p>
-            )}
-          </section>
+        {/* Specialist recommendation context */}
+        {tab === "recommended" && recData?.reason && (
+          <div
+            className="px-4 py-3.5 rounded-xl text-sm leading-relaxed"
+            style={{
+              background: "var(--violet-light)",
+              border:     "1px solid var(--violet-subtle)",
+              color:      "var(--text-primary)",
+            }}
+          >
+            {recData.reason}
+          </div>
         )}
 
-        {/* ── All Specialists ── */}
-        {activeTab === "all" && (
-          <section className="space-y-4">
-            {allLoading ? (
-              <SpecialistSkeleton count={5} />
-            ) : Array.isArray(allSpecialists) && allSpecialists.length > 0 ? (
-              allSpecialists.map((sp: any) => (
-                <SpecialistCard key={sp.id} specialist={sp} />
-              ))
-            ) : (
-              <p className="text-sm text-slate-400 italic">No specialists found.</p>
-            )}
-          </section>
-        )}
+        {/* Specialist list */}
+        <div className="space-y-4">
+          {loading ? (
+            <SpecialistSkeleton />
+          ) : specialists.length > 0 ? (
+            specialists.map((sp: any) => <SpecialistCard key={sp.id} sp={sp} />)
+          ) : (
+            <p className="text-sm italic py-4" style={{ color: "var(--text-tertiary)" }}>
+              {tab === "recommended"
+                ? "Chat more to receive personalised specialist recommendations."
+                : "No specialists found."}
+            </p>
+          )}
+        </div>
 
-        {/* ── Educational Resources ── */}
-        <section>
-          <h2 className="font-serif text-2xl font-semibold text-slate-900 mb-6">
-            Educational Resources
+        {/* Educational resources */}
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight mb-4" style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
+            Educational resources
           </h2>
-          <div className="space-y-3">
-            {RESOURCES.map((resource) => (
+          <div className="space-y-2">
+            {RESOURCES.map((r) => (
               <div
-                key={resource.id}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden"
+                key={r.id}
+                style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}
               >
                 <button
-                  onClick={() =>
-                    setExpandedResource(
-                      expandedResource === resource.id ? null : resource.id
-                    )
-                  }
-                  className="w-full flex items-center gap-4 p-5 text-left hover:bg-slate-50 transition-colors"
+                  type="button"
+                  onClick={() => setExpanded(expanded === r.id ? null : r.id)}
+                  className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
+                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-subtle)"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                 >
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${resource.iconBg}`}
-                  >
-                    {resource.icon}
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={r.iconStyle}>
+                    {r.icon}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-slate-900">{resource.title}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{resource.subtitle}</p>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{r.title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>{r.subtitle}</p>
                   </div>
-                  {expandedResource === resource.id ? (
-                    <ChevronUp size={18} className="text-slate-400 shrink-0" />
-                  ) : (
-                    <ChevronDown size={18} className="text-slate-400 shrink-0" />
-                  )}
+                  <ChevronDown
+                    size={15}
+                    style={{
+                      color: "var(--text-tertiary)",
+                      flexShrink: 0,
+                      transform: expanded === r.id ? "rotate(180deg)" : "none",
+                      transition: "transform 180ms ease",
+                    }}
+                  />
                 </button>
-                {expandedResource === resource.id && (
-                  <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-3">
-                    {resource.items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-2 shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-slate-800">{item.title}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>
+                {expanded === r.id && (
+                  <div
+                    className="px-5 pb-5 space-y-3 fade-up"
+                    style={{ borderTop: "1px solid var(--border)" }}
+                  >
+                    <div className="pt-4 space-y-3">
+                      {r.items.map((item, i) => (
+                        <div key={i} className="flex gap-3">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full shrink-0 mt-2"
+                            style={{ background: "var(--violet)" }}
+                          />
+                          <div>
+                            <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                              {item.title}
+                            </p>
+                            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                              {item.description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* ── Crisis Resources ── */}
-        <section className="bg-rose-50 border border-rose-100 rounded-2xl p-6">
-          <h3 className="font-semibold text-rose-800 flex items-center gap-2 mb-3">
-            <Shield size={18} /> Crisis Support
-          </h3>
-          <p className="text-sm text-rose-700 mb-4 leading-relaxed">
+        {/* Crisis */}
+        <div
+          className="rounded-xl px-5 py-4"
+          style={{
+            background: "var(--red-light)",
+            border:     "1px solid rgba(220,38,38,0.15)",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Shield size={15} style={{ color: "var(--red)" }} />
+            <h3 className="text-sm font-semibold" style={{ color: "var(--red)" }}>Crisis support</h3>
+          </div>
+          <p className="text-sm mb-3 leading-relaxed" style={{ color: "var(--text-primary)" }}>
             If you are experiencing a mental health emergency, please reach out immediately.
           </p>
-          <div className="space-y-2">
-            {CRISIS_RESOURCES.map((r, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-rose-800">
-                <span className="font-semibold">{r.name}:</span>
-                <span>{r.contact}</span>
+          <div className="space-y-1">
+            {CRISIS.map((c, i) => (
+              <div key={i} className="text-sm" style={{ color: "var(--text-primary)" }}>
+                <span className="font-semibold">{c.name}:</span>{" "}
+                <span style={{ color: "var(--text-secondary)" }}>{c.contact}</span>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
       </div>
     </div>
   );
 }
 
-// ── Specialist Card ───────────────────────────────────────────
 
-function SpecialistCard({ specialist: sp }: { specialist: any }) {
+
+function SpecialistCard({ sp }: { sp: any }) {
+  const consult = CONSULT[sp.consultationType];
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6">
+    <div
+      className="p-5"
+      style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", boxShadow: "var(--shadow-xs)" }}
+    >
       <div className="flex items-start gap-4">
-        {/* Avatar */}
-        <div className="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center text-teal-700 font-semibold text-lg shrink-0">
-          {sp.name
-            .split(" ")
-            .map((n: string) => n[0])
-            .join("")
-            .slice(0, 2)}
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
+          style={{ background: "var(--violet-light)", color: "var(--violet)" }}
+        >
+          {sp.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
         </div>
-
-        {/* Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-slate-900">{sp.name}</h3>
-            {sp.verified && (
-              <BadgeCheck size={16} className="text-teal-500 shrink-0" />
-            )}
-          </div>
-          <p className="text-sm text-slate-500 mt-0.5">{sp.title}</p>
-          <p className="text-xs text-teal-700 font-medium mt-1">{sp.specialization}</p>
-
-          <div className="flex flex-wrap gap-3 mt-3 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
-              <Star size={12} className="text-amber-400 fill-amber-400" />
-              {sp.rating}
-            </span>
-            <span className="flex items-center gap-1">
-              <BookOpen size={12} />
-              {sp.yearsOfExperience} yrs experience
-            </span>
-            <span className="flex items-center gap-1">
-              <MapPin size={12} />
-              {sp.location}
-            </span>
-            <span className="flex items-center gap-1">
-              {CONSULT_ICON[sp.consultationType]}
-              {CONSULT_LABELS[sp.consultationType]}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{sp.name}</span>
+            {sp.verified && <BadgeCheck size={14} style={{ color: "var(--cyan)", flexShrink: 0 }} />}
+            <span
+              className="px-1.5 py-px text-[10px] font-medium rounded"
+              style={{ background: "var(--violet-light)", color: "var(--violet)" }}
+            >
+              {sp.specialization}
             </span>
           </div>
+          <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>{sp.title}</p>
 
-          <div className="flex flex-wrap gap-3 mt-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
-              <Globe size={12} />
-              {sp.languages?.join(", ")}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock size={12} />
-              {sp.availability}
-            </span>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs" style={{ color: "var(--text-tertiary)" }}>
+            <span className="flex items-center gap-1"><Star size={11} style={{ color: "#f59e0b", fill: "#f59e0b" }} />{sp.rating}</span>
+            <span className="flex items-center gap-1"><BookOpen size={11} />{sp.yearsOfExperience} yrs</span>
+            <span className="flex items-center gap-1"><MapPin size={11} />{sp.location}</span>
+            {consult && <span className="flex items-center gap-1">{consult.icon} {consult.label}</span>}
+            <span className="flex items-center gap-1"><Clock size={11} />{sp.availability}</span>
           </div>
 
-          <p className="text-xs text-slate-500 mt-3 leading-relaxed line-clamp-2">{sp.bio}</p>
+          <p className="text-xs mt-2 leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+            {sp.bio}
+          </p>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {sp.tags?.slice(0, 4).map((tag: string) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          {sp.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {sp.tags.slice(0, 5).map((tag: string) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 text-[10px] rounded"
+                  style={{ border: "1px solid var(--border)", color: "var(--text-tertiary)" }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
+      {(sp.email || sp.phone) && (
+        <div
+          className="flex items-center gap-4 mt-4 pt-4"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          {sp.email && (
+            <a href={`mailto:${sp.email}`} className="flex items-center gap-1.5 text-xs transition-colors" style={{ color: "var(--text-secondary)" }}>
+              <Mail size={12} />{sp.email}
+            </a>
+          )}
+          {sp.phone && (
+            <a href={`tel:${sp.phone}`} className="flex items-center gap-1.5 text-xs transition-colors" style={{ color: "var(--text-secondary)" }}>
+              <Phone size={12} />{sp.phone}
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function SpecialistSkeleton({ count }: { count: number }) {
+
+function SpecialistSkeleton() {
   return (
-    <div className="space-y-4 animate-pulse">
-      {[...Array(count)].map((_, i) => (
-        <div key={i} className="bg-white border border-slate-100 rounded-2xl p-6 h-36" />
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <div
+          key={i}
+          className="p-5"
+          style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)" }}
+        >
+          <div className="flex items-start gap-4">
+            <div className="skeleton w-11 h-11 shrink-0" style={{ borderRadius: "var(--r-lg)" }} />
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="skeleton h-4 w-40 max-w-full" />
+              <div className="skeleton h-3 w-28 max-w-full" />
+              <div className="flex gap-3 mt-1">
+                {[...Array(3)].map((_, j) => <div key={j} className="skeleton h-3 w-12" />)}
+              </div>
+              <div className="skeleton h-3 w-full" />
+              <div className="skeleton h-3 w-[80%]" />
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );
 }
 
-// ── Static Data ───────────────────────────────────────────────
 
-const CRISIS_RESOURCES = [
-  { name: "Nigeria Suicide Prevention", contact: "0800-SUICIDE (0800-784-2433)" },
-  { name: "LASUTH Psychiatric Emergency", contact: "+234-01-793-0284" },
-  { name: "Crisis Text Line (International)", contact: "Text HOME to 741741" },
-  { name: "WHO Mental Health Helpline", contact: "Visit who.int/mental_health" },
+const CRISIS = [
+  { name: "Nigeria Suicide Prevention",    contact: "0800-100-0000" },
+  { name: "Mentally Aware Nigeria (MANI)", contact: "0800-MANI-000" },
+  { name: "International Association",     contact: "iasp.info/resources/Crisis_Centres" },
 ];
 
 const RESOURCES = [
   {
-    id: "anxiety",
-    title: "Understanding Anxiety",
-    subtitle: "What it is, what it feels like, and how to cope",
-    icon: <Heart size={20} className="text-rose-500" />,
-    iconBg: "bg-rose-50",
+    id: "anxiety", title: "Understanding anxiety", subtitle: "Recognise symptoms and coping strategies",
+    iconStyle: { background: "var(--violet-light)", color: "var(--violet)" },
+    icon: <Brain size={16} />,
     items: [
-      {
-        title: "Recognising Anxiety",
-        description:
-          "Anxiety is your body's natural response to stress. It becomes a concern when it interferes with daily life. Common signs include racing thoughts, physical tension, and avoidance.",
-      },
-      {
-        title: "Grounding Techniques",
-        description:
-          "The 5-4-3-2-1 method can help bring you back to the present moment: name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste.",
-      },
-      {
-        title: "Breathing Exercises",
-        description:
-          "Box breathing (inhale 4 counts, hold 4, exhale 4, hold 4) activates your parasympathetic nervous system and can reduce acute anxiety.",
-      },
-      {
-        title: "When to Seek Help",
-        description:
-          "If anxiety is persistent, impairing your daily function, or causing panic attacks, speaking with a CBT therapist or anxiety specialist may be beneficial.",
-      },
+      { title: "What is anxiety?",         description: "Anxiety is a natural stress response. It becomes a concern when persistent and interfering with daily life." },
+      { title: "Common symptoms",          description: "Racing thoughts, physical tension, avoidance, difficulty sleeping, and an exaggerated sense of dread." },
+      { title: "Grounding techniques",     description: "The 5-4-3-2-1 method: name 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste." },
+      { title: "When to seek help",        description: "If anxiety interferes with daily life for more than a few weeks, speak with a licensed therapist." },
     ],
   },
   {
-    id: "stress",
-    title: "Stress Management",
-    subtitle: "Tools and perspectives for managing daily stress",
-    icon: <Brain size={20} className="text-violet-500" />,
-    iconBg: "bg-violet-50",
+    id: "sleep", title: "Sleep & mental health", subtitle: "Why rest matters and how to improve it",
+    iconStyle: { background: "#f5f3ff", color: "#6d28d9" },
+    icon: <Moon size={16} />,
     items: [
-      {
-        title: "Identifying Your Stressors",
-        description:
-          "Stress becomes manageable when you can name its sources. Journaling or mood tracking helps identify patterns — is your stress higher on certain days or in certain contexts?",
-      },
-      {
-        title: "Time Boundaries",
-        description:
-          "Setting clear work-life boundaries reduces chronic stress. Consider regular 'switching off' rituals: a short walk, turning off notifications, or a fixed end-of-day routine.",
-      },
-      {
-        title: "Physical Release",
-        description:
-          "Stress hormones are designed to fuel physical action. Even brief walks, stretching, or light exercise can help metabolise cortisol and adrenaline effectively.",
-      },
-      {
-        title: "Social Support",
-        description:
-          "Talking to trusted people reduces the physiological impact of stress. You do not need to solve your problems to benefit — being heard is itself healing.",
-      },
+      { title: "Sleep and mood",       description: "Poor sleep amplifies negative emotions and reduces your capacity to regulate stress." },
+      { title: "Sleep hygiene basics", description: "Consistent sleep times, limiting screens before bed, cool and dark bedroom." },
+      { title: "Wind-down routine",    description: "A 30-minute pre-bed wind-down signals to your brain that rest is coming." },
+      { title: "When sleep is a sign", description: "Persistent insomnia or hypersomnia can be symptoms of depression or anxiety." },
     ],
   },
   {
-    id: "depression",
-    title: "Navigating Low Mood & Depression",
-    subtitle: "Understanding the difference and finding your way forward",
-    icon: <Wind size={20} className="text-blue-500" />,
-    iconBg: "bg-blue-50",
+    id: "mindfulness", title: "Mindfulness & breathing", subtitle: "Simple practices to ground yourself",
+    iconStyle: { background: "#ecfdf5", color: "#059669" },
+    icon: <Wind size={16} />,
     items: [
-      {
-        title: "Low Mood vs. Depression",
-        description:
-          "Low mood is temporary and often tied to circumstances. Depression is more persistent, affects multiple areas of life, and may include physical symptoms like fatigue, appetite changes, and difficulty concentrating.",
-      },
-      {
-        title: "Behavioural Activation",
-        description:
-          "Depression often reduces motivation, which reduces activity, which deepens depression. Gently reintroducing small, enjoyable or meaningful activities — even when motivation is low — can break this cycle.",
-      },
-      {
-        title: "Self-Compassion",
-        description:
-          "Depression is not a character flaw or weakness. Treating yourself with the kindness you would extend to a friend can soften the self-critical voice that often accompanies low mood.",
-      },
-      {
-        title: "Professional Support",
-        description:
-          "Depression is treatable. Psychotherapy (especially CBT and interpersonal therapy) and, where appropriate, medication can significantly reduce symptoms. Consider speaking with a counsellor or psychologist.",
-      },
+      { title: "Box breathing",      description: "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat for 2–4 minutes." },
+      { title: "Body scan",          description: "Slowly bring attention from feet to head, releasing tension wherever you find it." },
+      { title: "Mindful observation",description: "Spend two minutes observing a single object in detail — texture, colour, shape." },
     ],
   },
   {
-    id: "sleep",
-    title: "Sleep Health",
-    subtitle: "Building a foundation for restorative rest",
-    icon: <Moon size={20} className="text-indigo-500" />,
-    iconBg: "bg-indigo-50",
+    id: "relationships", title: "Relationships & support", subtitle: "Connection and knowing when to ask for help",
+    iconStyle: { background: "#fff1f2", color: "#e11d48" },
+    icon: <Heart size={16} />,
     items: [
-      {
-        title: "Sleep Hygiene Basics",
-        description:
-          "Consistent sleep and wake times, a cool and dark bedroom, and avoiding screens for 30-60 minutes before bed are among the most evidence-based steps for improving sleep quality.",
-      },
-      {
-        title: "Managing Worry at Night",
-        description:
-          "If racing thoughts keep you awake, a 'worry journal' before bed — writing down thoughts and a brief plan — can help externalise the mental load and reduce nighttime rumination.",
-      },
-      {
-        title: "The Anxiety-Sleep Cycle",
-        description:
-          "Poor sleep increases anxiety, and anxiety worsens sleep. CBT-I (Cognitive Behavioural Therapy for Insomnia) is the gold standard treatment and often more effective than medication long-term.",
-      },
-    ],
-  },
-  {
-    id: "mindfulness",
-    title: "Mindfulness & Wellbeing",
-    subtitle: "Cultivating presence and emotional resilience",
-    icon: <Heart size={20} className="text-teal-500" />,
-    iconBg: "bg-teal-50",
-    items: [
-      {
-        title: "What Is Mindfulness?",
-        description:
-          "Mindfulness is the practice of paying deliberate, non-judgmental attention to the present moment. It does not require clearing your mind — simply noticing thoughts without getting swept away by them.",
-      },
-      {
-        title: "Starting a Practice",
-        description:
-          "Begin with just 5 minutes daily. Choose a consistent time, sit comfortably, and focus on your breath. When your mind wanders (it will), gently return your attention without self-criticism.",
-      },
-      {
-        title: "Mindfulness in Daily Life",
-        description:
-          "You do not need a formal meditation session to be mindful. Eating slowly, walking without your phone, or fully focusing on a single task are all mindfulness practices.",
-      },
-      {
-        title: "Evidence-Based Benefits",
-        description:
-          "Research supports mindfulness for reducing anxiety, improving emotional regulation, decreasing rumination, and increasing overall wellbeing — even with brief, consistent practice.",
-      },
+      { title: "Social connection",  description: "Strong social bonds are one of the biggest predictors of long-term mental health." },
+      { title: "How to ask for help",description: "Be specific: 'I've been struggling. Could we talk this week?' is easier to respond to." },
+      { title: "Setting boundaries", description: "Healthy boundaries protect your energy. You can say no to people and yes to yourself." },
     ],
   },
 ];
-
 ```
 
 ## src/app/api/auth/[...nextauth]/route.ts
@@ -4991,48 +3282,251 @@ export async function GET(req: Request) {
 ```css
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   MindBridge — Modern Design System
+   Palette: pure white base · violet primary · cyan accent · zinc neutrals
+   Philosophy: clean, alive, modern — like Vercel/Linear/Luma
+───────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Surfaces ── */
+  --bg:           #ffffff;
+  --bg-subtle:    #fafafa;
+  --bg-muted:     #f4f4f5;        /* zinc-100 */
+  --card:         #ffffff;
+  --card-hover:   #fafafa;
+  --overlay:      rgba(0,0,0,0.45);
+
+  /* ── Text ── */
+  --text-primary:   #09090b;      /* zinc-950 */
+  --text-secondary: #52525b;      /* zinc-600 */
+  --text-tertiary:  #a1a1aa;      /* zinc-400 */
+  --text-inverse:   #ffffff;
+
+  /* ── Primary — Violet ── */
+  --violet:         #7c3aed;      /* violet-600 */
+  --violet-hover:   #6d28d9;      /* violet-700 */
+  --violet-light:   #f5f3ff;      /* violet-50 */
+  --violet-subtle:  #ddd6fe;      /* violet-200 */
+  --violet-fg:      #ffffff;
+
+  /* ── Accent — Cyan ── */
+  --cyan:           #06b6d4;      /* cyan-500 */
+  --cyan-light:     #ecfeff;      /* cyan-50 */
+  --cyan-subtle:    #a5f3fc;      /* cyan-200 */
+
+  /* ── Status ── */
+  --green:          #16a34a;
+  --green-light:    #f0fdf4;
+  --amber:          #d97706;
+  --amber-light:    #fffbeb;
+  --red:            #dc2626;
+  --red-light:      #fef2f2;
+
+  /* ── Borders ── */
+  --border:         #e4e4e7;      /* zinc-200 */
+  --border-strong:  #a1a1aa;      /* zinc-400 */
+  --border-focus:   #7c3aed;
+
+  /* ── Sidebar (always dark) ── */
+  --sidebar-bg:     #09090b;      /* zinc-950 */
+  --sidebar-border: rgba(255,255,255,0.07);
+  --sidebar-text:   rgba(255,255,255,0.55);
+  --sidebar-text-active: rgba(255,255,255,0.95);
+  --sidebar-hover:  rgba(255,255,255,0.06);
+  --sidebar-active: rgba(124,58,237,0.2);
+  --sidebar-active-border: #7c3aed;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+  --shadow-violet: 0 0 0 3px rgba(124,58,237,0.15);
+
+  /* ── Radius ── */
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   14px;
+  --r-xl:   20px;
+  --r-full: 9999px;
+
+  /* ── Motion ── */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast:  120ms;
+  --t-base:  180ms;
+  --t-slow:  300ms;
+
+  /* ── Font ── */
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Fira Code', monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─────────────────────────────────────────────────────────────────────────
+   Base
+───────────────────────────────────────────────────────────────────────── */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-
-
-.sidebar-scroll::-webkit-scrollbar {
-  width: 6px;
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
 }
- 
-.sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
+
+::selection {
+  background: var(--violet-subtle);
+  color: var(--text-primary);
 }
- 
+
+input[type="range"] { accent-color: var(--violet); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Scrollbars
+───────────────────────────────────────────────────────────────────────── */
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scroll-thin::-webkit-scrollbar { width: 4px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--r-full);
+}
+
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar { width: 3px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: #334155; /* slate-700, matches the inline scrollbarColor */
-  border-radius: 9999px;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--r-full);
 }
- 
-.sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #475569; /* slate-600 */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Skeleton shimmer — the key: it matches real component shapes exactly
+───────────────────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-muted) 25%,
+    #e4e4e7 50%,
+    var(--bg-muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+/* Dark skeleton variant — inside the sidebar or dark surfaces */
+.skeleton-dark {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Fade-in entrance
+───────────────────────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp var(--t-slow) var(--ease-out) both;
+}
+
+.fade-up-delay-1 { animation-delay: 60ms;  }
+.fade-up-delay-2 { animation-delay: 120ms; }
+.fade-up-delay-3 { animation-delay: 180ms; }
+.fade-up-delay-4 { animation-delay: 240ms; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Typing dots — calm, not bouncy
+───────────────────────────────────────────────────────────────────────── */
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.75); }
+  40%           { opacity: 1;    transform: scale(1);    }
+}
+
+.typing-dot {
+  animation: blink 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Signature element — the violet send button pulse when AI is loading
+───────────────────────────────────────────────────────────────────────── */
+
+@keyframes violet-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(124,58,237,0); }
+}
+
+.btn-send-loading {
+  animation: violet-pulse 1.6s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Chat prose (ReactMarkdown output)
+───────────────────────────────────────────────────────────────────────── */
+
+.prose-chat p            { margin: 0 0 0.6em; line-height: 1.65; }
+.prose-chat p:last-child { margin-bottom: 0; }
+.prose-chat ul, .prose-chat ol { margin: 0.4em 0; padding-left: 1.4em; }
+.prose-chat li           { margin-bottom: 0.25em; line-height: 1.55; }
+.prose-chat strong       { font-weight: 600; }
+.prose-chat code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-muted);
+  padding: 0.15em 0.35em;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Reduced motion
+───────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 ```
 
@@ -5040,55 +3534,59 @@ body {
 
 ```typescript
 import type { Metadata } from "next";
-import { Nunito, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "../components/Providers";
 
-const nunito = Nunito({ 
+const geist = Geist({
   subsets: ["latin"],
-  variable: '--font-nunito' 
+  variable: "--font-geist-sans",
+  display: "swap",
 });
 
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  style: ['normal', 'italic'],
-  variable: '--font-playfair' 
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'MindBridge | AI Mental Wellness',
-  description: 'Your safe space for reflection and AI-powered mental support.',
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
+  title: { default: "MindBridge", template: "%s · MindBridge" },
+  description: "A private space to reflect, track your mood, and find support.",
+  icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
   openGraph: {
-    type: 'website',
-    url: 'https://mindbridge.app',
-    title: 'MindBridge',
-    description: 'AI-driven mental health support and daily reflection.',
-    siteName: 'MindBridge',
-    images: [{
-      url: '/og-image.png',
-      width: 1200,
-      height: 630,
-      alt: 'MindBridge App Preview',
-    }],
+    type: "website",
+    url: "https://mindbridge.pxxl.run",
+    title: "MindBridge",
+    description: "AI-powered mental wellness. Private. Empathetic. Yours.",
+    siteName: "MindBridge",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${nunito.variable} ${playfair.variable} font-sans bg-slate-50 text-slate-900`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geist.variable} ${geistMono.variable}`}
+        style={{ fontFamily: "var(--font-geist-sans, var(--font-sans))" }}
+      >
         <AuthProvider>
-          {/* THE TOASTER MUST BE HERE */}
-          <Toaster richColors position="top-center" theme="light" className="font-sans" />
+          <Toaster
+            richColors
+            position="top-center"
+            theme="light"
+            toastOptions={{
+              style: {
+                fontFamily: "var(--font-geist-sans, system-ui)",
+                fontSize: "13px",
+                borderRadius: "10px",
+                border: "1px solid var(--border)",
+                boxShadow: "var(--shadow-lg)",
+              },
+            }}
+          />
           {children}
         </AuthProvider>
       </body>
@@ -5106,27 +3604,20 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (mode === "signup") {
         const res = await fetch("/api/auth/register", {
@@ -5134,27 +3625,13 @@ export default function AuthPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
         });
-
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong during registration.");
-        }
-        
-        toast.success("Account created successfully!");
+        if (!res.ok) throw new Error(data.error || "Registration failed.");
+        toast.success("Account created.");
       }
-
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      });
-
-      if (result?.error) {
-        throw new Error("Invalid email or password");
-      }
-
-      toast.success("Welcome back!");
+      const result = await signIn("credentials", { redirect: false, email: form.email, password: form.password });
+      if (result?.error) throw new Error("Invalid email or password.");
+      toast.success("Welcome back.");
       router.push("/dashboard");
       router.refresh();
     } catch (err: any) {
@@ -5165,74 +3642,152 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
-      <div className="hidden lg:flex w-[420px] bg-gradient-to-br from-slate-900 to-slate-800 flex-col p-12 relative overflow-hidden">
-        <div className="absolute w-[300px] h-[300px] bg-teal-500 rounded-full blur-[80px] opacity-20 -bottom-12 -right-20" />
-        <div className="absolute w-[200px] h-[200px] bg-emerald-500 rounded-full blur-[80px] opacity-20 top-24 -left-16" />
+    <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
 
-        <div className="relative z-10 flex-1 flex flex-col">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center text-xl shadow-md">🌿</div>
-            <div className="font-serif text-2xl font-bold text-white">MindBridge<span className="text-teal-400">.</span></div>
-          </div>
+      <div
+        className="hidden lg:flex w-[420px] shrink-0 flex-col justify-between p-12"
+        style={{ background: "var(--sidebar-bg)" }}
+      >
+        <Logo dark />
 
-          <div className="mt-auto font-serif text-[22px] italic text-slate-300 leading-relaxed">
-            "You don't have to control your thoughts. You just have to stop letting them control you."
-            <div className="text-slate-500 text-sm mt-4 font-sans not-italic">— Dan Millman</div>
-          </div>
+        <div>
+          <p
+            className="text-2xl font-semibold leading-snug mb-4 tracking-tight"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          >
+            "The journey of a thousand miles begins with one step."
+          </p>
+          <span className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+            — Lao Tzu
+          </span>
         </div>
+
+        <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          © 2026 MindBridge
+        </p>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-[460px] bg-white rounded-3xl p-10 shadow-sm border-1 border-slate-100">
-          <h1 className="font-serif text-3xl font-bold text-slate-900 mb-2 tracking-tight">
-            {mode === "login" ? "Welcome back" : "Create account"}
-          </h1>
-          <p className="text-slate-500 text-sm mb-8 font-sans">
-            {mode === "login"
-              ? "Sign in to your MindBridge account"
-              : "Join our wellness community today"}
-          </p>
+        <div className="w-full max-w-[400px] fade-up">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-10">
+            <Logo />
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold tracking-tight mb-1.5" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+              {mode === "login" ? "Welcome back" : "Create your account"}
+            </h1>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              {mode === "login"
+                ? "Sign in to continue to MindBridge."
+                : "Start your wellness journey today."}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-3">
             {mode === "signup" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">First Name</label>
-                  <input required name="firstName" value={form.firstName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Amara" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Last Name</label>
-                  <input required name="lastName" value={form.lastName} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="Obi" />
-                </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="First name">
+                  <Input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Amara" required autoComplete="given-name" />
+                </Field>
+                <Field label="Last name">
+                  <Input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Obi" required autoComplete="family-name" />
+                </Field>
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Email Address</label>
-              <input required type="email" name="email" value={form.email} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="you@example.com" />
-            </div>
+            <Field label="Email">
+              <Input type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@example.com" required autoComplete="email" />
+            </Field>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-600 mb-2 tracking-wide uppercase font-sans">Password</label>
-              <input required type="password" name="password" value={form.password} onChange={handleChange} className="font-sans w-full p-3 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400" placeholder="••••••••" />
-            </div>
+            <Field label="Password">
+              <Input type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" required autoComplete={mode === "login" ? "current-password" : "new-password"} />
+            </Field>
 
-            <button disabled={loading} type="submit" className="font-sans w-full p-4 mt-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-white font-bold transition-all shadow-sm disabled:opacity-70">
-              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 text-sm font-medium rounded-lg transition-all mt-1 disabled:opacity-50"
+              style={{ background: "var(--violet)", color: "white" }}
+            >
+              {loading ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
             </button>
           </form>
 
-          <div className="text-center mt-8 text-slate-500 text-sm font-sans">
+          <p className="text-center mt-6 text-sm" style={{ color: "var(--text-secondary)" }}>
             {mode === "login" ? (
-              <>New here? <button onClick={() => setMode("signup")} className="text-teal-600 font-bold hover:underline">Create account</button></>
+              <>New here?{" "}
+                <button type="button" onClick={() => setMode("signup")} className="font-medium underline underline-offset-2" style={{ color: "var(--violet)" }}>
+                  Create account
+                </button>
+              </>
             ) : (
-              <>Have an account? <button onClick={() => setMode("login")} className="text-teal-600 font-bold hover:underline">Sign in</button></>
+              <>Already have an account?{" "}
+                <button type="button" onClick={() => setMode("login")} className="font-medium underline underline-offset-2" style={{ color: "var(--violet)" }}>
+                  Sign in
+                </button>
+              </>
             )}
-          </div>
+          </p>
+
+          <p className="text-center mt-4 text-xs" style={{ color: "var(--text-tertiary)" }}>
+            By continuing, you agree to our{" "}
+            <a href="/" className="underline underline-offset-2">Terms</a> and{" "}
+            <a href="/" className="underline underline-offset-2">Privacy Policy</a>.
+          </p>
         </div>
       </div>
     </div>
+  );
+}
+
+function Logo({ dark = false }: { dark?: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--violet)" }}>
+        <Sparkles size={14} color="white" />
+      </span>
+      <span className="font-semibold text-[15px]" style={{ color: dark ? "rgba(255,255,255,0.9)" : "var(--text-primary)" }}>
+        MindBridge
+      </span>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className={`w-full px-3 py-2.5 text-sm rounded-lg outline-none transition-all ${className}`}
+      style={{
+        background: "var(--bg-subtle)",
+        border: "1px solid var(--border)",
+        color: "var(--text-primary)",
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.borderColor = "var(--violet)";
+        e.currentTarget.style.boxShadow = "var(--shadow-violet)";
+        e.currentTarget.style.background = "var(--bg)";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.borderColor = "var(--border)";
+        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.background = "var(--bg-subtle)";
+      }}
+      {...props}
+    />
   );
 }
 ```
@@ -5242,93 +3797,463 @@ export default function AuthPage() {
 ```typescript
 "use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Brain, HeartPulse, ShieldCheck, ArrowRight, Menu, X } from 'lucide-react';
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight, Brain, HeartPulse, ShieldCheck, X, Menu, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const scrollTo = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    if (id === "hero") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans overflow-x-hidden">
-      {/* Navigation */}
-      <nav className="w-full px-6 py-8 flex items-center justify-between z-50">
-        <div className="flex items-center gap-2 font-serif text-2xl font-bold">
-          <span className="text-teal-600 text-xl">🌿</span> MindBridge
-        </div>
+    <div className="min-h-screen bg-slate-50 font-sans">
+      {/* ── Hero / Nav ─────────────────────────────────────────────── */}
+      <div className="relative bg-[#1a0b2e] rounded-b-[3rem] md:rounded-b-[5rem] overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-40 mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2400&q=80')",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0b2e]/80 to-transparent" />
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/login" className="text-sm font-semibold hover:text-teal-600 transition-colors">Sign In</Link>
-          <Link href="/login" className="px-6 py-2.5 bg-slate-900 text-white text-sm rounded-full font-semibold hover:bg-slate-800 transition-all">
-            Get Started
+        <header className="relative z-40 w-full px-5 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-md flex items-center justify-center bg-purple-400">
+                <Sparkles size={16} color="#1a0b2e" />
+              </span>
+              <span className="font-semibold text-lg tracking-tight text-white">
+                MindBridge
+              </span>
+            </div>
+
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-8 bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
+              <a href="#" onClick={scrollTo("hero")} className="text-sm text-white/90 hover:text-white transition-colors cursor-pointer">Welcome</a>
+              <a href="#about" onClick={scrollTo("about")} className="text-sm text-white/90 hover:text-white transition-colors cursor-pointer">About</a>
+              <a href="#features" onClick={scrollTo("features")} className="text-sm text-white/90 hover:text-white transition-colors cursor-pointer">Features</a>
+            </nav>
+
+            <div className="hidden md:flex">
+              <Link
+                href="/login"
+                className="px-5 py-2.5 text-sm font-medium rounded-full bg-[#10061e] text-white hover:bg-[#08030f] transition-all flex items-center gap-2"
+              >
+                Sign in <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden p-2 rounded-md text-white relative z-50"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
+            >
+              {/* Animated icon swap */}
+              <span
+                className="absolute inset-0 flex items-center justify-center transition-all duration-300"
+                style={{
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "rotate(0deg) scale(1)" : "rotate(-90deg) scale(0.5)",
+                }}
+              >
+                <X size={24} />
+              </span>
+              <span
+                className="flex items-center justify-center transition-all duration-300"
+                style={{
+                  opacity: menuOpen ? 0 : 1,
+                  transform: menuOpen ? "rotate(90deg) scale(0.5)" : "rotate(0deg) scale(1)",
+                }}
+              >
+                <Menu size={24} />
+              </span>
+            </button>
+          </div>
+
+          {/* ── Mobile drawer ──────────────────────────────────────── */}
+          {/*
+            We keep it in the DOM always and animate height + opacity
+            so CSS transitions fire smoothly on both open and close.
+          */}
+          <div
+            className="md:hidden absolute top-full left-0 w-full bg-[#1a0b2e]/95 backdrop-blur-md border-t border-white/10 overflow-hidden"
+            style={{
+              maxHeight: menuOpen ? "320px" : "0px",
+              opacity: menuOpen ? 1 : 0,
+              transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease",
+              pointerEvents: menuOpen ? "auto" : "none",
+            }}
+          >
+            <div
+              className="px-5 py-6 flex flex-col gap-5"
+              style={{
+                transform: menuOpen ? "translateY(0)" : "translateY(-12px)",
+                transition: "transform 0.4s cubic-bezier(0.4,0,0.2,1)",
+              }}
+            >
+              {["Welcome", "About", "Features"].map((item, i) => (
+                <a
+                  key={item}
+                  href={item === "Welcome" ? "#" : `#${item.toLowerCase()}`}
+                  className="text-sm text-white/90 hover:text-white transition-colors font-medium tracking-wide cursor-pointer"
+                  onClick={scrollTo(item === "Welcome" ? "hero" : item.toLowerCase())}
+                  style={{
+                    opacity: menuOpen ? 1 : 0,
+                    transform: menuOpen ? "translateX(0)" : "translateX(-16px)",
+                    transition: `opacity 0.35s ease ${0.05 * i + 0.1}s, transform 0.35s ease ${0.05 * i + 0.1}s`,
+                  }}
+                >
+                  {item}
+                </a>
+              ))}
+              <Link
+                href="/login"
+                className="py-2.5 px-4 text-sm font-medium rounded-full bg-purple-500 hover:bg-purple-400 text-white text-center mt-1 transition-colors"
+                style={{
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "translateX(0)" : "translateX(-16px)",
+                  transition: "opacity 0.35s ease 0.25s, transform 0.35s ease 0.25s",
+                }}
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero text */}
+        <section className="relative z-10 max-w-4xl mx-auto px-5 pt-20 pb-32 md:pt-32 md:pb-48 text-center">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6 text-white">
+            <span className="italic text-purple-400 font-serif pr-2">Feel heard.</span>
+            <br />
+            Get clarity.
+          </h1>
+          <p className="text-lg sm:text-xl max-w-xl mx-auto mb-10 leading-relaxed text-white/80">
+            A private space to reflect, track your emotions, and understand yourself better — with an AI companion that listens.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-medium rounded-full bg-purple-400 text-[#1a0b2e] hover:bg-purple-300 transition-all shadow-md shadow-purple-500/20"
+          >
+            Start for free <ArrowRight size={16} />
           </Link>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 z-50 relative" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
-
-      {/* Mobile Drawer Overlay */}
-      <div className={`fixed inset-0 bg-white z-40 flex flex-col items-center justify-center gap-8 transition-opacity duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-        <Link href="/login" className="text-2xl font-medium" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-        <Link href="/login" className="px-8 py-4 bg-teal-600 text-white rounded-full text-lg font-medium" onClick={() => setIsMenuOpen(false)}>
-          Get Started
-        </Link>
+        </section>
       </div>
 
-      {/* Hero Section */}
-      <main className="w-full px-6 pt-16 md:pt-24 pb-20 text-center">
-        <div className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest uppercase text-teal-700 bg-teal-50 rounded-full">
-          Reflect. Grow. Heal.
-        </div>
-        <h1 className="text-5xl md:text-7xl font-serif font-bold text-slate-900 mb-6 tracking-tight">
-          Your thoughts, <br className="hidden md:block"/> understood.
-        </h1>
-        <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-lg mx-auto leading-relaxed px-2">
-          MindBridge provides a safe, non-judgmental space to reflect on your day 
-          and gain clarity through empathetic AI conversation.
-        </p>
-        <Link 
-          href="/login"
-          className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-full text-base font-semibold hover:bg-teal-700 transition-all"
-        >
-          Get Started <ArrowRight size={18} />
-        </Link>
-      </main>
+      {/* ── About ─────────────────────────────────────────────────── */}
+      <section id="about" className="max-w-7xl mx-auto px-5 py-16 -mt-12 md:-mt-20 relative z-20">
+        <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-md">
+          <div
+            className="relative p-10 md:p-16 flex flex-col justify-center min-h-[350px]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(26, 11, 46, 0.8), rgba(26, 11, 46, 0.8)), url('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">About Our AI</h2>
+            <p className="text-white/80 leading-relaxed mb-6">
+              MindBridge was created to provide a safe, judgement-free zone for personal reflection.
+              Our empathetic AI model is designed to listen first, helping you spot patterns across
+              days, weeks, and months without ever lecturing or diagnosing.
+            </p>
+          </div>
 
-      {/* Features Grid */}
-      <section className="w-full px-6 py-20 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
-          <FeatureCard icon={<Brain size={24} className="text-teal-600" />} title="Empathetic AI" desc="Conversations designed to listen, reflect, and guide you through complex emotions." />
-          <FeatureCard icon={<HeartPulse size={24} className="text-teal-600" />} title="Mood Tracking" desc="Visualize your emotional trends over time with daily check-ins." />
-          <FeatureCard icon={<ShieldCheck size={24} className="text-teal-600" />} title="Private & Secure" desc="Your reflections belong to you. Your data is encrypted and strictly private." />
+          <div className="bg-gradient-to-br from-purple-50 to-purple-200 p-10 md:p-16 flex flex-col justify-center">
+            <div className="grid grid-cols-2 gap-8 mb-10">
+              {[
+                { value: "24/7", label: "Availability" },
+                { value: "100%", label: "Private & Secure" },
+                { value: "0", label: "Judgement" },
+              ].map(({ value, label }) => (
+                <div key={label}>
+                  <div className="text-4xl font-bold text-[#1a0b2e] mb-1">{value}</div>
+                  <div className="text-sm text-[#1a0b2e]/70 font-medium">{label}</div>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 w-fit px-6 py-3 text-sm font-medium rounded-full bg-purple-500 text-white hover:bg-purple-600 transition-all shadow-md shadow-purple-500/20"
+            >
+              Get started <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
-      
-      {/* Footer */}
-      <footer className="max-w-6xl mx-auto px-6 py-12 border-t border-slate-100 text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div>© 2026 MindBridge. All rights reserved.</div>
-        <div className="flex gap-8">
-          <Link href="/privacy" className="hover:text-teal-600">Privacy</Link>
-          <Link href="/terms" className="hover:text-teal-600">Terms</Link>
+
+      {/* ── Features ──────────────────────────────────────────────── */}
+      <section id="features" className="max-w-7xl mx-auto px-5 py-16 md:py-24">
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#1a0b2e]">AI Wellness Features</h2>
+          <div className="hidden md:flex gap-2">
+            <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-[#1a0b2e] hover:bg-purple-50 transition-colors bg-white">
+              <ChevronLeft size={20} />
+            </button>
+            <button className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-purple-500 hover:bg-purple-600 transition-colors shadow-sm shadow-purple-500/30">
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Card 1 — Empathetic AI */}
+          <FeatureCard
+            icon={<Brain size={22} />}
+            title="Empathetic AI"
+            desc="Conversations that listen first. MindBridge reflects, never lectures or diagnoses."
+            accentColor="#7c3aed"
+            accentBg="#f3f0ff"
+            illustration={<EmpathyIllustration />}
+          />
+
+          {/* Card 2 — Mood Tracking */}
+          <FeatureCard
+            icon={<HeartPulse size={22} />}
+            title="Mood tracking"
+            desc="Log how you feel daily. Spot patterns across days, weeks, and months."
+            accentColor="#7c3aed"
+            accentBg="#f3f0ff"
+            illustration={<MoodIllustration />}
+          />
+
+          {/* Card 3 — Private by default */}
+          <FeatureCard
+            icon={<ShieldCheck size={22} />}
+            title="Private by default"
+            desc="Your reflections belong to you alone. Never shared, never sold."
+            accentColor="#7c3aed"
+            accentBg="#f3f0ff"
+            illustration={<PrivacyIllustration />}
+          />
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────── */}
+      <footer className="bg-white border-t border-slate-100 mt-10">
+        <div className="max-w-7xl mx-auto px-5 py-12 flex flex-col items-center">
+          <p className="text-xs text-slate-400 mb-6 text-center max-w-xl leading-relaxed">
+            MindBridge is not a substitute for professional mental health care.
+            If you are in crisis, please contact a licensed professional immediately.
+          </p>
+          <div className="w-full flex flex-col md:flex-row items-center justify-between border-t border-slate-100 pt-6">
+            <span className="text-sm text-slate-400 mb-4 md:mb-0">© 2026 MindBridge</span>
+            <div className="flex items-center gap-6">
+              {["Privacy Policy", "Terms of Service", "Contact"].map((link) => (
+                <Link
+                  key={link}
+                  href={`/${link.toLowerCase().replace(/ /g, "-")}`}
+                  className="text-sm text-slate-500 hover:text-[#1a0b2e] transition-colors"
+                >
+                  {link}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </footer>
     </div>
   );
 }
 
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
+/* ─── Feature card component ──────────────────────────────────────────── */
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  accentColor: string;
+  accentBg: string;
+  illustration: React.ReactNode;
+}
+
+function FeatureCard({ icon, title, desc, accentColor, accentBg, illustration }: FeatureCardProps) {
   return (
-    <div className="space-y-4 px-2">
-      <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-6">
-        {icon}
+    <div className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
+      {/* Illustration area */}
+      <div
+        className="relative h-52 w-full flex items-center justify-center overflow-hidden"
+        style={{ background: accentBg }}
+      >
+        {/* Decorative blobs */}
+        <div
+          className="absolute -top-6 -right-6 w-28 h-28 rounded-full opacity-20 transition-transform duration-500 group-hover:scale-125"
+          style={{ background: accentColor }}
+        />
+        <div
+          className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-110"
+          style={{ background: accentColor }}
+        />
+        {/* Illustration */}
+        <div className="relative z-10 w-40 h-40 transition-transform duration-500 group-hover:scale-105">
+          {illustration}
+        </div>
       </div>
-      <h3 className="text-xl font-bold">{title}</h3>
-      <p className="text-slate-600 leading-relaxed text-base">{desc}</p>
+
+      {/* Text */}
+      <div className="p-6 flex flex-col flex-1">
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300"
+          style={{ background: accentBg, color: accentColor }}
+        >
+          {icon}
+        </div>
+        <h3 className="text-xl font-bold text-[#1a0b2e] mb-3">{title}</h3>
+        <p className="text-slate-500 leading-relaxed text-sm flex-1">{desc}</p>
+      </div>
     </div>
+  );
+}
+
+/* ─── Custom SVG illustrations ─────────────────────────────────────────── */
+
+/** Empathetic AI — person + speech bubbles */
+function EmpathyIllustration() {
+  return (
+    <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Body */}
+      <ellipse cx="80" cy="130" rx="32" ry="12" fill="#ddd6fe" opacity="0.5" />
+      <rect x="60" y="88" width="40" height="40" rx="12" fill="#7c3aed" opacity="0.15" />
+      {/* Head */}
+      <circle cx="80" cy="72" r="22" fill="#7c3aed" opacity="0.2" />
+      <circle cx="80" cy="72" r="16" fill="#7c3aed" opacity="0.35" />
+      {/* Face */}
+      <circle cx="74" cy="70" r="2.5" fill="#4c1d95" />
+      <circle cx="86" cy="70" r="2.5" fill="#4c1d95" />
+      <path d="M74 78 Q80 83 86 78" stroke="#4c1d95" strokeWidth="2" strokeLinecap="round" fill="none" />
+      {/* Left bubble */}
+      <rect x="16" y="42" width="46" height="26" rx="10" fill="white" stroke="#ddd6fe" strokeWidth="1.5" />
+      <path d="M38 68 L30 78 L44 68" fill="white" stroke="#ddd6fe" strokeWidth="1.5" strokeLinejoin="round" />
+      <rect x="23" y="49" width="32" height="4" rx="2" fill="#c4b5fd" />
+      <rect x="23" y="57" width="22" height="4" rx="2" fill="#e9d5ff" />
+      {/* Right bubble */}
+      <rect x="98" y="28" width="46" height="26" rx="10" fill="#7c3aed" />
+      <path d="M106 54 L120 64 L118 54" fill="#7c3aed" />
+      <rect x="105" y="35" width="32" height="4" rx="2" fill="white" opacity="0.9" />
+      <rect x="105" y="43" width="20" height="4" rx="2" fill="white" opacity="0.6" />
+    </svg>
+  );
+}
+
+/** Mood tracking — waveform + emoji row */
+function MoodIllustration() {
+  const moods = [
+    { cx: 28, emoji: "😔", fill: "#a78bfa" },
+    { cx: 56, emoji: "😐", fill: "#8b5cf6" },
+    { cx: 84, emoji: "🙂", fill: "#7c3aed" },
+    { cx: 112, emoji: "😊", fill: "#6d28d9" },
+    { cx: 140, emoji: "😄", fill: "#4c1d95" },
+  ];
+
+  return (
+    <svg viewBox="0 0 168 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Card bg */}
+      <rect x="12" y="10" width="144" height="140" rx="16" fill="white" stroke="#ddd6fe" strokeWidth="1.5" />
+      {/* Title line */}
+      <rect x="28" y="24" width="60" height="7" rx="3.5" fill="#c4b5fd" />
+      <rect x="28" y="35" width="40" height="5" rx="2.5" fill="#ede9fe" />
+      {/* Chart bars */}
+      {[
+        { x: 28, h: 28, y: 78 },
+        { x: 52, h: 42, y: 64 },
+        { x: 76, h: 20, y: 86 },
+        { x: 100, h: 50, y: 56 },
+        { x: 124, h: 34, y: 72 },
+      ].map((bar, i) => (
+        <rect
+          key={i}
+          x={bar.x}
+          y={bar.y}
+          width="18"
+          height={bar.h}
+          rx="5"
+          fill="#7c3aed"
+          opacity={0.25 + i * 0.15}
+        />
+      ))}
+      {/* Trend line */}
+      <polyline
+        points="37,78 61,64 85,86 109,56 133,72"
+        stroke="#7c3aed"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      {[
+        { cx: 37, cy: 78 },
+        { cx: 61, cy: 64 },
+        { cx: 85, cy: 86 },
+        { cx: 109, cy: 56 },
+        { cx: 133, cy: 72 },
+      ].map((pt, i) => (
+        <circle key={i} cx={pt.cx} cy={pt.cy} r="4" fill="#7c3aed" stroke="white" strokeWidth="2" />
+      ))}
+      {/* Emoji mood row */}
+      {moods.map(({ cx, emoji }) => (
+        <text key={cx} x={cx} y={138} textAnchor="middle" fontSize="16">
+          {emoji}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+/** Privacy — shield with lock */
+function PrivacyIllustration() {
+  return (
+    <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Glow ring */}
+      <circle cx="80" cy="80" r="58" fill="#ede9fe" opacity="0.6" />
+      <circle cx="80" cy="80" r="44" fill="#ddd6fe" opacity="0.5" />
+      {/* Shield */}
+      <path
+        d="M80 28 L112 42 L112 76 C112 96 96 110 80 120 C64 110 48 96 48 76 L48 42 Z"
+        fill="#7c3aed"
+        opacity="0.18"
+        stroke="#7c3aed"
+        strokeWidth="2"
+      />
+      <path
+        d="M80 36 L106 48 L106 76 C106 93 92 105 80 114 C68 105 54 93 54 76 L54 48 Z"
+        fill="#7c3aed"
+        opacity="0.3"
+      />
+      {/* Lock body */}
+      <rect x="66" y="80" width="28" height="22" rx="5" fill="#4c1d95" />
+      {/* Lock shackle */}
+      <path
+        d="M70 80 L70 73 A10 10 0 0 1 90 73 L90 80"
+        stroke="#4c1d95"
+        strokeWidth="4"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Keyhole */}
+      <circle cx="80" cy="89" r="4" fill="white" opacity="0.9" />
+      <rect x="78" y="91" width="4" height="6" rx="1" fill="white" opacity="0.9" />
+      {/* Sparkle dots */}
+      <circle cx="44" cy="52" r="4" fill="#a78bfa" opacity="0.7" />
+      <circle cx="116" cy="60" r="3" fill="#c4b5fd" opacity="0.8" />
+      <circle cx="52" cy="112" r="3" fill="#a78bfa" opacity="0.5" />
+      <circle cx="112" cy="108" r="4.5" fill="#c4b5fd" opacity="0.6" />
+    </svg>
   );
 }
 ```
@@ -5348,13 +4273,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 ## src/components/TypingIndicator.tsx
 
 ```typescript
-export const TypingIndicator = () => (
-  <div className="flex gap-1 p-4 bg-slate-100 rounded-2xl w-fit">
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-  </div>
-);
+
+export function TypingIndicator() {
+  return (
+    <span className="flex items-center gap-1.5" aria-label="MindBridge is typing">
+      <span className="w-1.5 h-1.5 rounded-full bg-subtle typing-dot" />
+      <span className="w-1.5 h-1.5 rounded-full bg-subtle typing-dot" />
+      <span className="w-1.5 h-1.5 rounded-full bg-subtle typing-dot" />
+    </span>
+  );
+}
 ```
 
 ## src/components/mood/MoodDistributionChart.tsx
@@ -5363,77 +4291,161 @@ export const TypingIndicator = () => (
 "use client";
 
 import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
 } from "recharts";
+import { useEffect, useState } from "react";
 
-const MOOD_COLOURS: Record<string, string> = {
-  HAPPY: "#10b981",
-  CALM: "#6366f1",
-  HOPEFUL: "#f59e0b",
-  NEUTRAL: "#94a3b8",
-  LONELY: "#60a5fa",
-  ANXIOUS: "#f97316",
-  SAD: "#3b82f6",
-  OVERWHELMED: "#8b5cf6",
-  ANGRY: "#ef4444",
-  FEARFUL: "#ec4899",
+const PALETTE = [
+  "#7c3aed","#06b6d4","#6366f1","#14b8a6","#8b5cf6",
+  "#a78bfa","#d97706","#f59e0b","#ef4444","#6b7280",
+];
+
+const MOOD_LABELS: Record<string, string> = {
+  HAPPY:"Happy", CALM:"Calm", HOPEFUL:"Hopeful", NEUTRAL:"Neutral", LONELY:"Lonely",
+  ANXIOUS:"Anxious", SAD:"Sad", OVERWHELMED:"Overwhelmed", ANGRY:"Angry", FEARFUL:"Fearful",
 };
 
-interface Props {
-  distribution: Record<string, number>;
+const MOOD_EMOJI: Record<string, string> = {
+  HAPPY:"😊", CALM:"😌", HOPEFUL:"🌟", NEUTRAL:"😐", LONELY:"💙",
+  ANXIOUS:"😰", SAD:"😔", OVERWHELMED:"😵", ANGRY:"😤", FEARFUL:"😨",
+};
+
+interface DistEntry {
+  key: string;
+  value: number;
+  name: string;
+  emoji: string;
 }
 
-export function MoodDistributionChart({ distribution }: Props) {
-  const data = Object.entries(distribution).map(([name, value]) => ({
-    name,
-    value,
-  }));
+function PieTipContent({
+  active,
+  payload,
+  total,
+}: {
+  active?: boolean;
+  payload?: { name: string; value: number; color: string }[];
+  total: number;
+}) {
+  if (!active || !payload?.length) return null;
+  const it = payload[0];
+  const value = Number(it.value ?? 0);
+  const pct = total ? Math.round((value / total) * 100) : 0;
 
-  if (data.length === 0) {
+  return (
+    <div style={{
+      background: "var(--card)",
+      border: "1px solid var(--border)",
+      borderRadius: "var(--r-md)",
+      padding: "8px 12px",
+      boxShadow: "var(--shadow-md)",
+      fontSize: 12,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: it.color, flexShrink: 0 }} />
+        <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{it.name}</span>
+      </div>
+      <p style={{ color: "var(--text-tertiary)", margin: 0 }}>
+        {value} log{value !== 1 ? "s" : ""} · {pct}%
+      </p>
+    </div>
+  );
+}
+
+export function MoodDistributionChart({
+  distribution,
+}: {
+  distribution: Record<string, number>;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!distribution || Object.keys(distribution).length === 0) {
     return (
-      <div className="h-40 flex items-center justify-center text-sm text-slate-400 italic">
-        No distribution data yet.
+      <div style={{ height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p className="text-sm italic" style={{ color: "var(--text-tertiary)" }}>
+          Log some moods to see your distribution.
+        </p>
       </div>
     );
   }
 
+  const data: DistEntry[] = Object.entries(distribution)
+    .filter(([, n]) => n > 0)
+    .sort(([, a], [, b]) => b - a)
+    .map(([key, value]) => ({
+      key,
+      value,
+      name:  MOOD_LABELS[key] ?? key,
+      emoji: MOOD_EMOJI[key] ?? "💭",
+    }));
+
+  const total = data.reduce((s, d) => s + d.value, 0);
+
+  if (!mounted) {
+    return <div style={{ height: 160 }} />;
+  }
+
   return (
-    <ResponsiveContainer width="100%" height={180}>
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={45}
-          outerRadius={70}
-          paddingAngle={3}
-          dataKey="value"
-        >
-          {data.map((entry) => (
-            <Cell
-              key={entry.name}
-              fill={MOOD_COLOURS[entry.name] ?? "#94a3b8"}
+    <div>
+      {/* Explicit height wrapper — required for ResponsiveContainer */}
+      <div style={{ position: "relative", width: "100%", height: 160, minWidth: 0, minHeight: 160 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius="38%"
+              outerRadius="68%"
+              paddingAngle={2}
+              strokeWidth={0}
+            >
+              {data.map((_, i) => (
+                <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              content={(props) => (
+                <PieTipContent
+                  active={props.active}
+                  payload={props.payload as unknown as { name: string; value: number; color: string }[]}
+                  total={total}
+                />
+              )}
             />
-          ))}
-        </Pie>
-        <Tooltip
-          formatter={(value: any, name: any) => [value, name]}
-        />
-        <Legend
-          iconType="circle"
-          iconSize={8}
-          formatter={(v) =>
-            v.charAt(0) + v.slice(1).toLowerCase()
-          }
-          wrapperStyle={{ fontSize: "11px" }}
-        />
-      </PieChart>
-    </ResponsiveContainer>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3">
+        {data.slice(0, 8).map((d, i) => (
+          <div key={d.key} className="flex items-center gap-1.5">
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: PALETTE[i % PALETTE.length],
+                flexShrink: 0,
+                display: "inline-block",
+              }}
+            />
+            <span className="text-[11px] truncate" style={{ color: "var(--text-secondary)" }}>
+              {d.emoji} {d.name}
+            </span>
+            <span
+              className="text-[11px] ml-auto shrink-0"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              {Math.round((d.value / total) * 100)}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 ```
@@ -5443,96 +4455,201 @@ export function MoodDistributionChart({ distribution }: Props) {
 ```typescript
 "use client";
 
-// src/components/mood/MoodTrendChart.tsx
-// ============================================================
-// Weekly Mood Trend Bar Chart using recharts.
-// recharts must be added: pnpm add recharts
-// ============================================================
-
 import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Cell,
+  ResponsiveContainer, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
+import { useEffect, useState } from "react";
 
-type TrendPoint = {
-  date: string;
-  label: string;
-  average: number | null;
+interface TrendPoint {
+  day: string;
+  avgIntensity: number;
+  avgSleep?: number | null;
+  avgEnergy?: number | null;
   count: number;
-};
-
-interface MoodTrendChartProps {
-  data: TrendPoint[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const d = payload[0].payload as TrendPoint;
-    return (
-      <div className="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm text-sm">
-        <p className="font-medium text-slate-800">{d.label}</p>
-        {d.average !== null ? (
-          <p className="text-teal-600 mt-0.5">Avg intensity: {d.average}/10</p>
-        ) : (
-          <p className="text-slate-400 mt-0.5 italic">No entries</p>
-        )}
-        {d.count > 0 && (
-          <p className="text-slate-400 mt-0.5">{d.count} log{d.count === 1 ? "" : "s"}</p>
-        )}
-      </div>
-    );
-  }
-  return null;
-};
+interface Colors {
+  violet: string;
+  cyan: string;
+  amber: string;
+  border: string;
+  subtle: string;
+  card: string;
+}
 
-export function MoodTrendChart({ data }: MoodTrendChartProps) {
-  if (!data || data.length === 0) {
-    return (
-      <div className="h-40 flex items-center justify-center text-sm text-slate-400 italic">
-        No mood data yet. Start logging to see your trend.
-      </div>
-    );
-  }
+function cssVar(name: string): string {
+  if (typeof window === "undefined") return "";
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function ChartTip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: { name: string; value: number; color: string }[];
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
 
   return (
-    <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={data} barSize={28}>
-        <CartesianGrid vertical={false} stroke="#f1f5f9" />
-        <XAxis
-          dataKey="label"
-          tick={{ fontSize: 12, fill: "#94a3b8" }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          domain={[0, 10]}
-          ticks={[0, 2, 4, 6, 8, 10]}
-          tick={{ fontSize: 11, fill: "#94a3b8" }}
-          axisLine={false}
-          tickLine={false}
-          width={24}
-        />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafc" }} />
-        <Bar dataKey="average" radius={[6, 6, 0, 0]}>
-          {data.map((entry, i) => (
-            <Cell
-              key={i}
-              fill={entry.average === null ? "#e2e8f0" : "#0d9488"}
-              opacity={entry.average === null ? 0.4 : 1}
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div
+      style={{
+        background: "var(--card)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--r-md)",
+        padding: "8px 12px",
+        boxShadow: "var(--shadow-md)",
+        fontSize: 12,
+      }}
+    >
+      {label && (
+        <p style={{ color: "var(--text-tertiary)", marginBottom: 4, fontWeight: 500 }}>
+          {label}
+        </p>
+      )}
+      {payload.map((e) => (
+        <div
+          key={String(e.name)}
+          style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: e.color,
+              flexShrink: 0,
+              display: "inline-block",
+            }}
+          />
+          <span style={{ color: "var(--text-primary)" }}>
+            {e.name}: <strong>{Number(e.value ?? 0).toFixed(1)}/10</strong>
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
+export function MoodTrendChart({ data }: { data: TrendPoint[] }) {
+  const [mounted, setMounted] = useState(false);
+  const [c, setC] = useState<Colors>({
+    violet: "#7c3aed",
+    cyan:   "#06b6d4",
+    amber:  "#d97706",
+    border: "#e4e4e7",
+    subtle: "#a1a1aa",
+    card:   "#ffffff",
+  });
+
+  useEffect(() => {
+    setMounted(true);
+    setC({
+      violet: cssVar("--violet")        || "#7c3aed",
+      cyan:   cssVar("--cyan")          || "#06b6d4",
+      amber:  cssVar("--amber")         || "#d97706",
+      border: cssVar("--border")        || "#e4e4e7",
+      subtle: cssVar("--text-tertiary") || "#a1a1aa",
+      card:   cssVar("--card")          || "#ffffff",
+    });
+  }, []);
+
+  if (!data || data.length === 0) {
+    return (
+      <div style={{ height: 190, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p className="text-sm italic" style={{ color: "var(--text-tertiary)" }}>
+          Not enough data yet.
+        </p>
+      </div>
+    );
+  }
+
+  // Don't render the chart at all until the client has mounted and the
+  // parent container has a real pixel size — prevents the width/height=-1 error.
+  if (!mounted) {
+    return <div style={{ height: 190 }} />;
+  }
+
+  const hasSleep  = data.some((d) => d.avgSleep  != null);
+  const hasEnergy = data.some((d) => d.avgEnergy != null);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: 190,
+        minWidth: 0,       // lets flex/grid children shrink below content size
+        minHeight: 190,    // guarantees recharts gets a positive height
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={c.border} vertical={false} />
+          <XAxis
+            dataKey="day"
+            tick={{ fill: c.subtle, fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            domain={[0, 10]}
+            tickCount={5}
+            tick={{ fill: c.subtle, fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip
+            content={(props) => (
+              <ChartTip
+                active={props.active}
+                payload={props.payload as unknown as { name: string; value: number; color: string }[]}
+                label={typeof props.label === "string" ? props.label : String(props.label ?? "")}
+              />
+            )}
+          />
+          <Line
+            type="monotone"
+            dataKey="avgIntensity"
+            stroke={c.violet}
+            strokeWidth={2}
+            dot={{ fill: c.card, stroke: c.violet, strokeWidth: 2, r: 3 }}
+            activeDot={{ r: 5, fill: c.violet, stroke: c.card, strokeWidth: 2 }}
+            name="Mood"
+            connectNulls
+          />
+          {hasSleep && (
+            <Line
+              type="monotone"
+              dataKey="avgSleep"
+              stroke={c.cyan}
+              strokeWidth={1.5}
+              dot={false}
+              strokeDasharray="4 3"
+              name="Sleep"
+              connectNulls
+            />
+          )}
+          {hasEnergy && (
+            <Line
+              type="monotone"
+              dataKey="avgEnergy"
+              stroke={c.amber}
+              strokeWidth={1.5}
+              dot={false}
+              strokeDasharray="2 3"
+              name="Energy"
+              connectNulls
+            />
+          )}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 ```
 
 ## src/hooks/use-chat-logic.ts
@@ -6457,11 +5574,11 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token;
-    const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname === "/";
+    const token    = req.nextauth.token;
+    const isAuth   = !!token;
+    const pathname = req.nextUrl.pathname;
 
-    if (isAuth && isAuthPage) {
+    if (isAuth && pathname === "/login") {
       return NextResponse.redirect(new URL("/chat", req.url));
     }
 
@@ -6470,12 +5587,13 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        if (req.nextUrl.pathname === "/") return true;
+        const pathname = req.nextUrl.pathname;
+        if (pathname === "/" || pathname === "/login") return true;
         return !!token;
       },
     },
     pages: {
-      signIn: "/",
+      signIn: "/login",
     },
   }
 );
@@ -6483,10 +5601,11 @@ export default withAuth(
 export const config = {
   matcher: [
     "/",
+    "/login",
     "/chat/:path*",
     "/dashboard/:path*",
+    "/mood/:path*",
     "/support/:path*",
-    "/mood/:path*"
   ],
 };
 ```
@@ -6732,6 +5851,7 @@ declare module "next-auth/jwt" {
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -6740,22 +5860,93 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        sage: { DEFAULT: '#7a9e7e', light: '#a8c5ac', dark: '#4a7a4f' },
-        cream: '#faf7f2',
-        'warm-white': '#fffef9',
-        earth: { DEFAULT: '#8b6f47', light: '#c4a882' },
-        forest: '#2d5a3d',
-        blush: '#e8b4a0',
-        text: { dark: '#2a2a2a', mid: '#5a5a5a', light: '#8a8a8a' },
+        background: "var(--background)",
+        "background-alt": "var(--background-alt)",
+        surface: "var(--surface)",
+        "surface-hover": "var(--surface-hover)",
+        "surface-raised": "var(--surface-raised)",
+
+        foreground: "var(--foreground)",
+        muted: "var(--foreground-muted)",
+        subtle: "var(--foreground-subtle)",
+        inverse: "var(--foreground-inverse)",
+
+        primary: {
+          DEFAULT: "var(--primary)",
+          hover: "var(--primary-hover)",
+          muted: "var(--primary-muted)",
+          subtle: "var(--primary-subtle)",
+          fg: "var(--primary-fg)",
+        },
+
+        accent: {
+          DEFAULT: "var(--accent)",
+          muted: "var(--accent-muted)",
+          subtle: "var(--accent-subtle)",
+        },
+
+        success: "var(--success)",
+        "success-muted": "var(--success-muted)",
+        warning: "var(--warning)",
+        "warning-muted": "var(--warning-muted)",
+        destructive: "var(--destructive)",
+        "destructive-muted": "var(--destructive-muted)",
+        "destructive-fg": "var(--destructive-fg)",
+
+        border: "var(--border)",
+        "border-strong": "var(--border-strong)",
+        "border-focus": "var(--border-focus)",
       },
+
       fontFamily: {
-        sans: ['var(--font-nunito)', 'sans-serif'],
-        serif: ['var(--font-playfair)', 'serif'],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
+      },
+
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        DEFAULT: "var(--radius)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        full: "var(--radius-full)",
+      },
+
+      boxShadow: {
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+      },
+
+      transitionTimingFunction: {
+        spring: "var(--ease-spring)",
+        smooth: "var(--ease-smooth)",
+      },
+      transitionDuration: {
+        fast: "var(--duration-fast)",
+        normal: "var(--duration-normal)",
+        slow: "var(--duration-slow)",
+      },
+
+      spacing: {
+        1: "var(--space-1)",
+        2: "var(--space-2)",
+        3: "var(--space-3)",
+        4: "var(--space-4)",
+        5: "var(--space-5)",
+        6: "var(--space-6)",
+        8: "var(--space-8)",
+        10: "var(--space-10)",
+        12: "var(--space-12)",
       },
     },
   },
   plugins: [],
 };
+
 export default config;
 ```
 
