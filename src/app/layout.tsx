@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: { default: "MindBridge", template: "%s · MindBridge" },
   description: "A private space to reflect, track your mood, and find support.",
-  icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
+  icons: { icon: "/mind.ico", apple: "/apple-touch-icon.png" },
   openGraph: {
     type: "website",
     url: "https://mindbridge.pxxl.run",

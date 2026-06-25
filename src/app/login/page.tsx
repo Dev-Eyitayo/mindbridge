@@ -146,10 +146,12 @@ export default function AuthPage() {
 function Logo({ dark = false }: { dark?: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--violet)" }}>
-        <Sparkles size={14} color="white" />
-      </span>
-      <span className="font-semibold text-[15px]" style={{ color: dark ? "rgba(255,255,255,0.9)" : "var(--text-primary)" }}>
+      <img 
+        src="/logo.png" 
+        alt="MindBridge Logo" 
+        className="w-12 h-12 object-contain"
+      />
+      <span className="font-semibold text-[14px]" style={{ color: "var(--sidebar-text-active)" }}>
         MindBridge
       </span>
     </div>

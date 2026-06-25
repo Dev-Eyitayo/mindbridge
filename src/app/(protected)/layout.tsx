@@ -66,9 +66,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         style={{ borderBottom: "1px solid var(--sidebar-border)" }}
       >
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "var(--violet)" }}>
-            <Sparkles size={13} color="white" />
-          </span>
+          <img 
+            src="/logo.png" 
+            alt="MindBridge Logo" 
+            className="w-12 h-12 object-contain"
+          />
           <span className="font-semibold text-[14px]" style={{ color: "var(--sidebar-text-active)" }}>
             MindBridge
           </span>
